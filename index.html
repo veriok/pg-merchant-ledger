@@ -311,6 +311,7 @@ footer a:hover { color:var(--gold); }
 <!-- SELLING -->
 <div class="panel active" id="panel-selling">
   <div class="toolbar">
+    <input class="ctrl-input" type="text" id="sell-search" placeholder="Search by name…" autocomplete="off">
     <select class="ctrl-select" id="sel-type">
       <option value="all">All Item Types</option>
       <option value="Food">🍖 Food</option>
@@ -338,7 +339,7 @@ footer a:hover { color:var(--gold); }
 <!-- GIFTING -->
 <div class="panel" id="panel-gifting">
   <div class="toolbar">
-    <input class="ctrl-input" type="text" id="gift-search" placeholder="Search by item tag (e.g. Mushroom, Gem…)">
+    <input class="ctrl-input" type="text" id="gift-search" placeholder="Search by name…" autocomplete="off">
     <button class="ctrl-btn" id="btn-gift-fav">★ Fav Only</button>
     <span class="toolbar-label ml-auto" style="font-size:0.78rem">Estimates assume starting from 0 within current level.</span>
   </div>
@@ -745,7 +746,7 @@ const VENDORS_DATA = [
 
   { id:"kib_the_unkillable", name:"Kib the Unkillable", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
     buyTypes:[{t:"Equipment",m:100}],
-    limits:[{c:100,p:5000}, {c:200,p:null}, {c:1000,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:1200,p:60000}],
+    limits:[{c:100,p:5000}, {c:200,p:7500}, {c:300,p:10000}, {c:400,p:20000}, {c:1000,p:40000}, {c:1100,p:50000}, {c:1200,p:60000}],
     loves:["Swords", "Shields", "Fire Staves", "Trophy Animal Hides"], likes:[], hates:[] },
 
   { id:"mandibles", name:"Mandibles", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
@@ -755,17 +756,17 @@ const VENDORS_DATA = [
 
   { id:"otis", name:"Otis", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
     buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
-    limits:[{c:500,p:2000}, {c:500,p:2000}, {c:null,p:3500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:4000}, {c:1000,p:4500}],
+    limits:[{c:500,p:2000}, {c:500,p:2000}, {c:600,p:2500}, {c:700,p:3000}, {c:800,p:3500}, {c:900,p:4000}, {c:1000,p:4500}],
     loves:["Meat-Heavy Prepared Meals", "Clubs", "Hammers"], likes:[], hates:[] },
 
   { id:"ragabir", name:"Ragabir", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
     buyTypes:[{t:"Potions",m:100}, {t:"Monster Parts",m:100}, {t:"Food",m:100}],
-    limits:[{c:50,p:2500}, {c:150,p:7500}, {c:null,p:30000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:1200,p:60000}],
+    limits:[{c:50,p:2500}, {c:150,p:7500}, {c:300,p:15000}, {c:450,p:22500}, {c:600,p:30000}, {c:750,p:45000}, {c:1200,p:60000}],
     loves:["Alchemy Recipes", "Bones", "Alchemy Ingredients"], likes:[], hates:[] },
 
   { id:"tavilak", name:"Tavilak", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
     buyTypes:[{t:"Food",m:100}, {t:"Phlog",m:10}, {t:"Potions",m:10}, {t:"Gems",m:10}, {t:"Leather",m:10}, {t:"Skins",m:10}, {t:"Tools",m:10}, {t:"Equipment",m:10}, {t:"Jewelry",m:10}, {t:"Monster Parts",m:10}],
-    limits:[{c:50,p:2500}, {c:null,p:2500}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:60000}],
+    limits:[{c:50,p:2500}, {c:null,p:2500}, {c:null,p:5000}, {c:50,p:10000}, {c:null,p:20000}, {c:null,p:40000}, {c:null,p:60000}],
     loves:["Fresh"], likes:[], hates:[] },
 
   { id:"willem_fangblade", name:"Willem Fangblade", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
@@ -900,7 +901,7 @@ function fmtNum(n) {
 // ═══════════════════════════════════════════════════════════════════════
 let F = {
   itemType: 'all', favOnly: false, beastOnly: false, hideEmpty: false,
-  sort: 'name', giftFavOnly: false, giftSearch: '',
+  sort: 'name', giftFavOnly: false, giftSearch: '', sellSearch: '',
 };
 
 function getEffectiveBuyTypes(vd) {
@@ -920,6 +921,9 @@ function renderSelling() {
     const pool = lvl.p;
     const cash = s.cashRemaining;
     const displayCash = cash !== null ? cash : pool;
+
+    // Filter by name search
+    if (F.sellSearch && !vd.name.toLowerCase().includes(F.sellSearch.toLowerCase())) return null;
 
     // Filter by item type
     let typeMatch = null, reducedMatch = false;
@@ -1029,11 +1033,7 @@ function renderGifting() {
   const vendors = VENDORS_DATA.filter(vd => {
     const s = getVS(vd.id);
     if (F.giftFavOnly && !s.isFavorite) return false;
-    if (search) {
-      const combined = [...vd.loves, ...vd.likes].join(' ').toLowerCase();
-      const gt = s.giftTable.map(r => r.name || '').join(' ').toLowerCase();
-      if (!combined.includes(search) && !gt.includes(search)) return false;
-    }
+    if (search && !vd.name.toLowerCase().includes(search)) return false;
     return true;
   });
 
@@ -1166,6 +1166,7 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 });
 
 // Selling toolbar
+document.getElementById('sell-search').addEventListener('input', e => { F.sellSearch = e.target.value; renderSelling(); });
 document.getElementById('sel-type').addEventListener('change', e => { F.itemType = e.target.value; renderSelling(); });
 
 document.getElementById('btn-fav-only').addEventListener('click', function() {
