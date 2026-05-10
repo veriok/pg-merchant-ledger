@@ -315,15 +315,20 @@ footer a:hover { color:var(--gold); }
     <select class="ctrl-select" id="sel-type">
       <option value="all">All Item Types</option>
       <option value="Food">🍖 Food</option>
-      <option value="Potions">⚗ Potions</option>
+      <option value="Potions">🧪 Potions</option>
       <option value="Phlog">✨ Phlog</option>
       <option value="Gems">💎 Gems</option>
-      <option value="Tools">🔧 Tools</option>
+      <option value="Tools">🔨 Tools</option>
       <option value="Skins">🦊 Skins</option>
-      <option value="Leather">📜 Leather</option>
+      <option value="Leather">🟫 Leather</option>
       <option value="Equipment">⚔ Equipment</option>
       <option value="Jewelry">💍 Jewelry</option>
-      <option value="Monster Parts">💀 Monster Parts</option>
+      <option value="Monster Parts">🏹 Monster Parts</option>
+      <option value="Skulls">💀 Skulls/Bones</option>
+      <option value="Recipes">📄 Recipes</option>
+      <option value="Cloth Armor">👚 Cloth Armor</option>
+      <option value="Carpentry">🪑 Carpentry/Wood</option>
+      <option value="Augument">⚪ Augument</option>
     </select>
     <button class="ctrl-btn" id="btn-fav-only">★ Fav Only</button>
     <button class="ctrl-btn" id="btn-beast-only">🐾 Beast Speech</button>
@@ -386,105 +391,105 @@ footer a:hover { color:var(--gold); }
 // ═══════════════════════════════════════════════════════════════════════
 const FAVOR_LEVELS = ['Neutral','Comfortable','Friends','Close Friends','Best Friends','Like Family','Soul Mates'];
 const FAVOR_STEP   = [100, 200, 300, 600, 800, 1000];  // favor to go from level i to i+1
-const ITEM_TYPES   = ['Food','Potions','Phlog','Gems','Tools','Skins','Leather','Equipment','Jewelry','Monster Parts'];
-const TYPE_ICON    = {Food:'🍖',Potions:'⚗',Phlog:'✨',Gems:'💎',Tools:'🔧',Skins:'🦊',Leather:'📜',Equipment:'⚔',Jewelry:'💍','Monster Parts':'💀'};
+const ITEM_TYPES   = ['Food','Potions','Phlog','Gems','Tools','Skins','Leather','Equipment','Jewelry','Monster Parts', 'Skulls', 'Recipes', 'Cloth Armor', 'Carpentry', 'Augument'];
+const TYPE_ICON    = {Food:'🍖',Potions:'🧪',Phlog:'✨',Gems:'💎',Tools:'🔨',Skins:'🦊',Leather:'🟫',Equipment:'⚔',Jewelry:'💍','Monster Parts':'🏹','Skulls':'💀', 'Recipes':'📄', 'Cloth Armor':'👚', 'Carpentry':'🪑', 'Augument':'⚪'};
 const SEVEN_DAYS   = 7 * 24 * 60 * 60 * 1000;
-const REGION_ICON  = {Serbule:'🏰',Eltibule:'🗺',Kur:'⛰','Kur Mountains':'⛰','Sun Vale':'☀','Rahu':'🏛'};
+const REGION_ICON  = {'Serbule':'🏰', 'Eltibule':'🏟️','Kur Mountains':'⛰️','Sun Vale':'☀️','Ilmari':'🏜️', 'Rahu':'⛓️', 'Statehelm':'👑', 'Red Wing Casino':'🐦', 'Fae Realm':'🧚‍♀️'};
 
 // limits array index matches FAVOR_LEVELS index
 // {c: capPerItem, p: weeklyPool}  null = unknown/won't buy at that level
 const VENDORS_DATA = [
-  { id:"azalak", name:"Azalak", region:"Serbule", location:"Serbule", beastSpeak:true,
-    buyTypes:[{t:"Potions",m:100}, {t:"Skins",m:100}],
+  { id:"azalak", name:"Azalak", region:"Serbule", location:"North from Town", beastSpeak:true,
+    buyTypes:[{t:"Potions",m:100}, {t:"Skulls",m:100}],
     limits:[{c:null,p:null}, {c:null,p:null}, {c:null,p:25000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:35000}, {c:null,p:35000}],
     loves:["Gems", "Flowers", "Books", "Head Gear"], likes:[], hates:[] },
 
-  { id:"charles_thompson", name:"Charles Thompson", region:"Serbule", location:"Serbule", beastSpeak:false,
-    buyTypes:[],
-    limits:[{c:null,p:null}, {c:150,p:7500}, {c:636,p:35000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:45000}, {c:null,p:60000}],
+  { id:"charles_thompson", name:"Charles Thompson", region:"Serbule", location:"Tent Southwest from Town", beastSpeak:true,
+    buyTypes:[{t:"Potions",m:100}, {t:"Monster Parts",m:100} ],
+    limits:[{c:null,p:null}, {c:150,p:7500}, {c:300,p:15000}, {c:450,p:20000}, {c:636,p:35000}, {c:null,p:45000}, {c:null,p:60000}],
     loves:["Mushrooms of all Types", "Combat Beakers and Flasks", "Rare Alchemy Recipes"], likes:[], hates:[] },
 
-  { id:"elahil", name:"Elahil", region:"Serbule", location:"Serbule", beastSpeak:false,
+  { id:"elahil", name:"Elahil", region:"Serbule", location:"City Center", beastSpeak:false,
     buyTypes:[{t:"Equipment",m:100}],
-    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1300,p:65000}],
+    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:200,p:10000}, {c:400,p:20000}, {c:800,p:40000}, {c:1000,p:50000}, {c:1300,p:65000}],
     loves:["Magical Bows"], likes:["Prepared Food", "Rings"], hates:["Drugs"] },
 
-  { id:"fainor", name:"Fainor", region:"Serbule", location:"Serbule", beastSpeak:true,
-    buyTypes:[{t:"Food",m:100}],
+  { id:"fainor", name:"Fainor", region:"Serbule", location:"Inn", beastSpeak:true,
+    buyTypes:[{t:"Food",m:100}, {t:"Recipes",m:100}],
     limits:[{c:50,p:2500}, {c:50,p:2500}, {c:400,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:500,p:25000}, {c:null,p:30000}],
     loves:[], likes:[], hates:[] },
 
-  { id:"flia", name:"Flia", region:"Serbule", location:"Serbule", beastSpeak:true,
-    buyTypes:[],
-    limits:[{c:null,p:null}, {c:200,p:10000}, {c:1600,p:80000}, {c:null,p:null}, {c:null,p:null}, {c:2000,p:100000}, {c:2400,p:120000}],
+  { id:"flia", name:"Flia", region:"Serbule", location:"East from Town", beastSpeak:true,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Recipes",m:100}],
+    limits:[{c:null,p:null}, {c:200,p:10000}, {c:400,p:20000}, {c:800,p:40000}, {c:1600,p:80000}, {c:2000,p:100000}, {c:2400,p:120000}],
     loves:["Rare Recipes and Knowledge", "Items With Interesting History"], likes:["Potions"], hates:["Food"] },
 
-  { id:"harry_the_wolf", name:"Harry the Wolf", region:"Serbule", location:"Serbule", beastSpeak:true,
-    buyTypes:[{t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Phlog",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+  { id:"harry_the_wolf", name:"Harry the Wolf", region:"Serbule", location:"Farm", beastSpeak:true,
+    buyTypes:[{t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Phlog",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}, {t:"Augument",m:100}],
     limits:[{c:75,p:3750}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
     loves:[], likes:[], hates:[] },
 
-  { id:"hulon", name:"Hulon", region:"Serbule", location:"Serbule", beastSpeak:true,
-    buyTypes:[],
-    limits:[{c:100,p:5000}, {c:119,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1200,p:60000}],
+  { id:"hulon", name:"Hulon", region:"Serbule", location:"City Center", beastSpeak:true,
+    buyTypes:[{t:"Recipes",m:100}],
+    limits:[{c:100,p:5000}, {c:119,p:5000}, {c:200,p:10000}, {c:400,p:20000}, {c:800,p:40000}, {c:1000,p:50000}, {c:1200,p:60000}],
     loves:["Seeds", "Seedlings"], likes:["Prepared Food", "Cooking Recipes"], hates:["Poetry"] },
 
-  { id:"joeh", name:"Joeh", region:"Serbule", location:"Serbule", beastSpeak:false,
+  { id:"joeh", name:"Joeh", region:"Serbule", location:"City Center", beastSpeak:false,
     buyTypes:[{t:"Equipment",m:100}],
     limits:[{c:100,p:5000}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1200,p:60000}],
     loves:["Swords", "Shields"], likes:[], hates:["Jewelry"] },
 
-  { id:"larsan", name:"Larsan", region:"Serbule", location:"Serbule", beastSpeak:true,
+  { id:"larsan", name:"Larsan", region:"Serbule", location:"City Center", beastSpeak:true,
     buyTypes:[{t:"Gems",m:100}, {t:"Jewelry",m:100}],
     limits:[{c:100,p:5000}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1000,p:50000}],
     loves:["Fancy Rings", "Precious Gems", "Figurines"], likes:[], hates:[] },
 
-  { id:"leonard_allenson", name:"Leonard Allenson", region:"Serbule", location:"Serbule", beastSpeak:true,
+  { id:"leonard_allenson", name:"Leonard Allenson", region:"Serbule", location:"East near Dungeon", beastSpeak:true,
     buyTypes:[],
     limits:[{c:200,p:10000}, {c:200,p:10000}, {c:1600,p:80000}, {c:null,p:null}, {c:null,p:null}, {c:2000,p:100000}, {c:2400,p:120000}],
     loves:["Equipment with Battle Chemistry prerequisites"], likes:[], hates:[] },
 
-  { id:"marna", name:"Marna", region:"Serbule", location:"Serbule", beastSpeak:false,
+  { id:"marna", name:"Marna", region:"Serbule", location:"City Center", beastSpeak:false,
     buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
     limits:[{c:500,p:2000}, {c:500,p:2000}, {c:800,p:3200}, {c:null,p:null}, {c:null,p:null}, {c:900,p:3600}, {c:1000,p:4000}],
     loves:["Rare Recipes", "Vegetarian Food", "Fire Staves"], likes:["Animal Skins"], hates:["Meat"] },
 
-  { id:"mushroom_jack", name:"Mushroom Jack", region:"Serbule", location:"Serbule", beastSpeak:true,
-    buyTypes:[],
-    limits:[{c:null,p:null}, {c:null,p:null}, {c:400,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:60000}],
+  { id:"mushroom_jack", name:"Mushroom Jack", region:"Serbule", location:"City Center", beastSpeak:true,
+    buyTypes:[{t:"Monster Parts",m:100}],
+    limits:[{c:null,p:null}, {c:null,p:null}, {c:100,p:5000}, {c:200,p:10000}, {c:400,p:20000}, {c:400,p:40000}, {c:400,p:60000}],
     loves:["Body Parts"], likes:["Miscellaneous Junk"], hates:[] },
 
-  { id:"roshun_the_traitor", name:"Roshun the Traitor", region:"Serbule", location:"Serbule", beastSpeak:true,
+  { id:"roshun_the_traitor", name:"Roshun the Traitor", region:"Serbule", location:"North from Town", beastSpeak:true,
     buyTypes:[{t:"Equipment",m:100}, {t:"Jewelry",m:100}],
     limits:[{c:150,p:5000}, {c:150,p:7500}, {c:null,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:65000}, {c:null,p:75000}],
     loves:["Staves", "Orcish Cultural Artifacts", "Gur-Horta"], likes:[], hates:["Nature"] },
 
-  { id:"sir_coth", name:"Sir Coth", region:"Serbule", location:"Serbule", beastSpeak:false,
+  { id:"sir_coth", name:"Sir Coth", region:"Serbule", location:"City Center", beastSpeak:false,
     buyTypes:[{t:"Food",m:100}, {t:"Monster Parts",m:100}, {t:"Jewelry",m:100}],
     limits:[{c:null,p:null}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1200,p:60000}],
     loves:["All Art", "Flawless Animal Skins", "Ivory"], likes:[], hates:["Potions"] },
 
-  { id:"tadion", name:"Tadion", region:"Serbule", location:"Serbule", beastSpeak:false,
+  { id:"tadion", name:"Tadion", region:"Serbule", location:"Marketplace", beastSpeak:false,
     buyTypes:[{t:"Equipment",m:100}],
-    limits:[{c:null,p:null}, {c:null,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:60000}],
+    limits:[{c:null,p:null}, {c:null,p:5000}, {c:null,p:10000}, {c:400,p:20000}, {c:800,p:40000}, {c:null,p:50000}, {c:null,p:60000}],
     loves:["Good Metal Slabs (or higher)", "Ancient Coins"], likes:["Metal Armor", "Snail Shells"], hates:[] },
 
-  { id:"therese", name:"Therese", region:"Serbule", location:"Serbule", beastSpeak:true,
+  { id:"therese", name:"Therese", region:"Serbule", location:"Farm", beastSpeak:true,
     buyTypes:[{t:"Food",m:100}, {t:"Phlog",m:10}, {t:"Potions",m:10}, {t:"Gems",m:10}, {t:"Leather",m:10}, {t:"Skins",m:10}, {t:"Tools",m:10}, {t:"Equipment",m:10}, {t:"Jewelry",m:10}, {t:"Monster Parts",m:10}],
     limits:[{c:50,p:2500}, {c:50,p:2500}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:60000}],
     loves:["Necklaces"], likes:["Seeds"], hates:["Meat and Meat Dishes", "Fish and Fish Dishes"] },
 
-  { id:"velkort", name:"Velkort", region:"Serbule", location:"Serbule", beastSpeak:true,
+  { id:"velkort", name:"Velkort", region:"Serbule", location:"City Center", beastSpeak:true,
     buyTypes:[],
     limits:[{c:null,p:null}, {c:50,p:2500}, {c:400,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:800,p:40000}, {c:1300,p:65000}],
     loves:[], likes:[], hates:["Food"] },
 
-  { id:"sir_arif", name:"Sir Arif", region:"Serbule Crypt", location:"Serbule Crypt", beastSpeak:true,
+  { id:"sir_arif", name:"Sir Arif", region:"Serbule", location:"Serbule Crypt", beastSpeak:true,
     buyTypes:[{t:"Food",m:100}, {t:"Potions",m:100}],
     limits:[{c:null,p:null}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:null,p:null}],
     loves:["Staves"], likes:["Anything Else Edible"], hates:["Fish"] },
 
-  { id:"way", name:"Way", region:"Myconian Cave", location:"Myconian Cave", beastSpeak:true,
+  { id:"way", name:"Way", region:"Serbule", location:"Myconian Cave", beastSpeak:true,
     buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
     limits:[{c:125,p:6250}, {c:150,p:7500}, {c:300,p:12500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:15000}, {c:null,p:17500}],
     loves:[], likes:["Vendor Trash", "Storage Crates", "Textiles"], hates:[] },
@@ -515,11 +520,11 @@ const VENDORS_DATA = [
     loves:["Calligraphy Benches", "Grapes"], likes:["Raw Meat"], hates:[] },
 
   { id:"paul_vaughn", name:"Paul Vaughn", region:"Serbule Hills", location:"Serbule Hills", beastSpeak:true,
-    buyTypes:[],
+    buyTypes:[{t:"Carpentry",m:100}],
     limits:[{c:50,p:2500}, {c:100,p:3750}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:600,p:30000}, {c:720,p:40000}],
     loves:["Perfect Pieces of Wood", "Dessert Meals"], likes:["Beer"], hates:[] },
 
-  { id:"helena_veilmoor", name:"Helena Veilmoor", region:"Eltibule", location:"Eltibule", beastSpeak:true,
+  { id:"helena_veilmoor", name:"Helena Veilmoor", region:"Eltibule", location:"Eltibule", beastSpeak:false,
     buyTypes:[{t:"Equipment",m:100}, {t:"Phlog",m:20}, {t:"Potions",m:20}, {t:"Food",m:20}, {t:"Gems",m:20}, {t:"Leather",m:20}, {t:"Skins",m:20}, {t:"Tools",m:20}, {t:"Jewelry",m:20}, {t:"Monster Parts",m:20}],
     limits:[{c:200,p:10000}, {c:200,p:10000}, {c:1600,p:80000}, {c:null,p:null}, {c:null,p:null}, {c:2000,p:100000}, {c:2400,p:120000}],
     loves:["Poetry", "Extremely Valuable Things", "Obsidian"], likes:[], hates:["Stupid Crap", "Gross Monster Bits"] },
@@ -550,13 +555,13 @@ const VENDORS_DATA = [
     loves:["Onyx"], likes:["Skins", "Potions"], hates:["Artwork"] },
 
   { id:"sie_antry", name:"Sie Antry", region:"Eltibule", location:"Eltibule", beastSpeak:true,
-    buyTypes:[{t:"Equipment",m:100}, {t:"Skins",m:100}, {t:"Phlog",m:100}],
+    buyTypes:[{t:"Equipment",m:100}, {t:"Skins",m:100}, {t:"Phlog",m:100}, {t:"Augument",m:100}],
     limits:[{c:null,p:null}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:null,p:50000}],
     loves:[], likes:[], hates:[] },
 
   { id:"suspicious_cow", name:"Suspicious_Cow", region:"Eltibule", location:"Eltibule", beastSpeak:true,
     buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
-    limits:[{c:50,p:2500}, {c:75,p:3750}, {c:150,p:7500}, {c:null,p:null}, {c:null,p:null}, {c:175,p:8750}, {c:200,p:10000}],
+    limits:[{c:50,p:2500}, {c:75,p:3750}, {c:100,p:5000}, {c:125,p:6250}, {c:150,p:7500}, {c:175,p:8750}, {c:200,p:10000}],
     loves:["Poetry", "Extremely Valuable Things", "Obsidian"], likes:[], hates:["Stupid Crap", "Gross Monster Bits"] },
 
   { id:"yetta", name:"Yetta", region:"Eltibule", location:"Eltibule", beastSpeak:false,
@@ -580,7 +585,7 @@ const VENDORS_DATA = [
     loves:[], likes:[], hates:[] },
 
   { id:"kodan", name:"Kodan", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
-    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    buyTypes:[{t:"Phlog",m:10}, {t:"Potions",m:10}, {t:"Food",m:10}, {t:"Gems",m:10}, {t:"Leather",m:10}, {t:"Skins",m:10}, {t:"Tools",m:10}, {t:"Equipment",m:100}, {t:"Jewelry",m:10}, {t:"Monster Parts",m:10}],
     limits:[{c:null,p:10000}, {c:null,p:10000}, {c:null,p:80000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:100000}, {c:null,p:null}],
     loves:["Figurines"], likes:["Good Metal Slabs (or higher)"], hates:[] },
 
@@ -600,7 +605,7 @@ const VENDORS_DATA = [
     loves:[], likes:["Raw Meat", "Shiny Crystals"], hates:[] },
 
   { id:"the_wombat", name:"The Wombat", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
-    buyTypes:[{t:"Skins",m:100}],
+    buyTypes:[{t:"Monster Parts",m:100}, {t:"Carpentry",m:100}],
     limits:[{c:25,p:1250}, {c:null,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:null}],
     loves:[], likes:[], hates:[] },
 
@@ -610,7 +615,7 @@ const VENDORS_DATA = [
     loves:["Racial-Slot Equipment"], likes:["Restorative Potions"], hates:[] },
 
   { id:"yogzi", name:"Yogzi", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
-    buyTypes:[{t:"Tools",m:100}],
+    buyTypes:[{t:"Tools",m:100}, {t:"Carpentry",m:100}],
     limits:[{c:25,p:1250}, {c:100,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:50000}],
     loves:["Magic Rings", "Skulls"], likes:[], hates:[] },
 
@@ -630,9 +635,9 @@ const VENDORS_DATA = [
     loves:[], likes:["Werewolf Oriented Magic Items", "Raw Fish", "Max-Health-Boosting Potions"], hates:[] },
 
   { id:"lamashu", name:"Lamashu", region:"Kur Mountains", location:"Kur Mountains", beastSpeak:false,
-    buyTypes:[],
-    limits:[{c:null,p:10000}, {c:null,p:10000}, {c:null,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:65000}, {c:null,p:85000}],
-    loves:[], likes:[], hates:[] },
+    buyTypes:[{t:"Carpentry",m:100}, {t:"Skins",m:100}, {t:"Leather",m:100}, {t:"Tools",m:100}],
+    limits:[{c:null,p:10000}, {c:null,p:10000}, {c:null,p:20000}, {c:null,p:35000}, {c:null,p:50000}, {c:null,p:65000}, {c:null,p:85000}],
+    loves:['Magic Oils', 'Onyx', 'Wood', 'Sexy Clothes', 'Fashonable Shoes'], likes:[], hates:[] },
 
   { id:"laura_neth", name:"Laura Neth", region:"Kur Mountains", location:"Kur Mountains", beastSpeak:false,
     buyTypes:[{t:"Food",m:100}, {t:"Phlog",m:10}, {t:"Potions",m:10}, {t:"Gems",m:10}, {t:"Leather",m:10}, {t:"Skins",m:10}, {t:"Tools",m:10}, {t:"Equipment",m:10}, {t:"Jewelry",m:10}, {t:"Monster Parts",m:10}],
@@ -655,7 +660,7 @@ const VENDORS_DATA = [
     loves:["Skulls of All Types", "Brains of All Types"], likes:["Cloth Armor"], hates:[] },
 
   { id:"arlan", name:"Arlan", region:"Ilmari", location:"Ilmari", beastSpeak:false,
-    buyTypes:[{t:"Food",m:100}, {t:"Phlog",m:100}, {t:"Potions",m:100}],
+    buyTypes:[{t:"Food",m:100}, {t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Augument",m:100}],
     limits:[{c:0,p:0}, {c:200,p:10000}, {c:1300,p:65000}, {c:null,p:null}, {c:null,p:null}, {c:1800,p:90000}, {c:2100,p:105000}],
     loves:["Skulls of All Types", "Brains of All Types", "Dragon Scales"], likes:[], hates:[] },
 
@@ -675,17 +680,17 @@ const VENDORS_DATA = [
     loves:["Piles of Raw Meat", "Ice Cores", "Bloodstones", "Exotic Cooking Recipes"], likes:[], hates:[] },
 
   { id:"urzab", name:"Urzab", region:"Ilmari", location:"Ilmari", beastSpeak:false,
-    buyTypes:[{t:"Gems",m:100}, {t:"Jewelry",m:100}, {t:"Phlog",m:100}],
+    buyTypes:[{t:"Gems",m:100}, {t:"Jewelry",m:100}, {t:"Phlog",m:100}, {t:"Augument",m:100}],
     limits:[{c:200,p:10000}, {c:200,p:10000}, {c:1000,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:2100,p:100000}, {c:null,p:100000}],
     loves:["Gems"], likes:["Crystals", "Jewelry"], hates:[] },
 
   { id:"amutasa", name:"Amutasa", region:"Rahu", location:"Rahu", beastSpeak:false,
-    buyTypes:[{t:"Tools",m:100}, {t:"Gems",m:100}, {t:"Potions",m:100}],
+    buyTypes:[{t:"Tools",m:100}, {t:"Gems",m:100}, {t:"Potions",m:100}, {t:"Carpentry",m:100}],
     limits:[{c:50,p:2500}, {c:50,p:5000}, {c:400,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:800,p:40000}, {c:1300,p:65000}],
     loves:[], likes:[], hates:[] },
 
   { id:"ashk_the_answerer", name:"Ashk the Answerer", region:"Rahu", location:"Rahu", beastSpeak:false,
-    buyTypes:[{t:"Equipment",m:100}, {t:"Phlog",m:100}, {t:"Skins",m:100}],
+    buyTypes:[{t:"Equipment",m:100}, {t:"Phlog",m:100}, {t:"Skins",m:100}, {t:"Augument",m:100}],
     limits:[{c:25,p:1250}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1100,p:50000}, {c:1100,p:50000}],
     loves:["Magic Equipment with", "Animal Horns", "Animal Stingers", "Animal Teeth"], likes:[], hates:[] },
 
@@ -735,7 +740,7 @@ const VENDORS_DATA = [
     loves:["Poisons", "Poisoned Food and Drink", "Magic Knives"], likes:[], hates:[] },
 
   { id:"sona", name:"Sona", region:"New Prestonbule Cave", location:"New Prestonbule Cave", beastSpeak:false,
-    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Gems",m:100}],
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Gems",m:100}, {t:"Augument",m:100}],
     limits:[{c:50,p:2500}, {c:null,p:5000}, {c:287,p:12500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:15000}, {c:null,p:null}],
     loves:["Clothing and Cloth Armor", "Phlogiston"], likes:[], hates:[] },
 
@@ -770,7 +775,7 @@ const VENDORS_DATA = [
     loves:["Fresh"], likes:[], hates:[] },
 
   { id:"willem_fangblade", name:"Willem Fangblade", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
-    buyTypes:[{t:"Gems",m:100}, {t:"Jewelry",m:100}, {t:"Phlog",m:100}],
+    buyTypes:[{t:"Gems",m:100}, {t:"Jewelry",m:100}, {t:"Phlog",m:100}, {t:"Augument",m:100}],
     limits:[{c:200,p:10000}, {c:200,p:10000}, {c:1000,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:2000,p:100000}, {c:null,p:100000}],
     loves:["Green Crystals", "Brass Items"], likes:[], hates:[] },
 
@@ -832,7 +837,72 @@ const VENDORS_DATA = [
   { id:"tryaka", name:"Tryaka", region:"Povus", location:"Povus", beastSpeak:false,
     buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
     limits:[{c:100,p:5000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
-    loves:[], likes:[], hates:[] }
+    loves:[], likes:[], hates:[] },
+
+  { id:"chancellor_algest", name:"Chancellor Algest", region:"Statehelm", location:"Statehelm Bank", beastSpeak:true,
+    buyTypes:[{t:"Recipes",m:100}],
+    limits:[{c:1000,p:50000}, {c:1000,p:50000}, {c:1000,p:50000}, {c:1000,p:50000}, {c:1000,p:50000}, {c:1000,p:50000}, {c:1000,p:50000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"classic_jim", name:"Classic Jim", region:"Statehelm", location:"Marketplace", beastSpeak:true,
+    buyTypes:[{t:"Food",m:100}],
+    limits:[{c:null,p:5000}, {c:null,p:5000}, {c:null,p:25000}, {c:null,p:50000}, {c:null,p:75000}, {c:null,p:100000}, {c:null,p:125000}],
+    loves:[], likes:['Meaty Dishes'], hates:[] },
+
+  { id:"deville_neth", name:"Deville Neth", region:"Statehelm", location:"Bakery", beastSpeak:false,
+    buyTypes:[{t:"Food",m:100}],
+    limits:[{c:null,p:5000}, {c:null,p:5000}, {c:null,p:15000}, {c:null,p:25000}, {c:null,p:50000}, {c:null,p:75000}, {c:null,p:100000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"elune", name:"Elune", region:"Statehelm", location:"Central District", beastSpeak:false,
+    buyTypes:[{t:"Jewelry",m:100}, {t:"Gems",m:100}],
+    limits:[{c:null,p:5000}, {c:null,p:5000}, {c:null,p:15000}, {c:null,p:30000}, {c:null,p:60000}, {c:null,p:90000}, {c:null,p:120000}],
+    loves:[], likes:['Jewelry'], hates:[] },
+
+  { id:"farsight_flemmings", name:"Farsight Flemmings", region:"Statehelm", location:"Marketplace", beastSpeak:false,
+    buyTypes:[{t:"Monster Parts",m:100}],
+    limits:[{c:null,p:5000}, {c:null,p:10000}, {c:null,p:20000}, {c:null,p:40000}, {c:null,p:75000}, {c:null,p:100000}, {c:null,p:120000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"grim_jim", name:"Grim Jim", region:"Statehelm", location:"Marketplace", beastSpeak:true,
+    buyTypes:[{t:"Skins",m:100}],
+    limits:[{c:null,p:5000}, {c:null,p:5000}, {c:null,p:25000}, {c:null,p:50000}, {c:null,p:75000}, {c:null,p:100000}, {c:null,p:125000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"jerasen", name:"Jerasen", region:"Statehelm", location:"Marketplace", beastSpeak:true,
+    buyTypes:[{t:"Cloth Armor",m:100}],
+    limits:[{c:null,p:5000}, {c:null,p:5000}, {c:null,p:25000}, {c:null,p:50000}, {c:null,p:75000}, {c:null,p:100000}, {c:null,p:125000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"jurl_blackhammer", name:"Jurl Blackhammer", region:"Statehelm", location:"Marketplace", beastSpeak:true,
+    buyTypes:[{t:"Tools",m:100}],
+    limits:[{c:null,p:5000}, {c:null,p:5000}, {c:500,p:25000}, {c:null,p:50000}, {c:null,p:75000}, {c:null,p:100000}, {c:null,p:125000}],
+    loves:[], likes:['Tools'], hates:[] },
+
+  { id:"mara_woodwright", name:"Mara Woodwright", region:"Statehelm", location:"Marketplace", beastSpeak:true,
+    buyTypes:[{t:"Carpentry",m:100}],
+    limits:[{c:null,p:5000}, {c:null,p:10000}, {c:null,p:20000}, {c:null,p:40000}, {c:null,p:75000}, {c:null,p:100000}, {c:null,p:125000}],
+    loves:[], likes:['Tools'], hates:[] },
+
+  { id:"michael_irasce", name:"Michael Irasce", region:"Statehelm", location:"Marketplace", beastSpeak:true,
+    buyTypes:[{t:"Recipes",m:100}],
+    limits:[{c:null,p:25000}, {c:null,p:25000}, {c:800,p:40000}, {c:null,p:60000}, {c:null,p:80000}, {c:null,p:100000}, {c:null,p:125000}],
+    loves:[], likes:['Tools'], hates:[] },
+
+  { id:"pumza", name:"Pumza", region:"Statehelm", location:"Marketplace", beastSpeak:true,
+    buyTypes:[{t:"Equipment",m:100}],
+    limits:[{c:null,p:5000}, {c:null,p:5000}, {c:null,p:25000}, {c:null,p:50000}, {c:null,p:75000}, {c:null,p:100000}, {c:null,p:125000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"sam_veilmoor", name:"Sam Veilmoor", region:"Statehelm", location:"Marketplace", beastSpeak:true,
+    buyTypes:[{t:"Equipment",m:100}],
+    limits:[{c:null,p:5000}, {c:null,p:5000}, {c:null,p:25000}, {c:null,p:50000}, {c:null,p:75000}, {c:null,p:100000}, {c:null,p:125000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"sulafa", name:"Sulafa", region:"Statehelm", location:"Marketplace", beastSpeak:true,
+    buyTypes:[{t:"Augument",m:100}],
+    limits:[{c:null,p:5000}, {c:null,p:5000}, {c:null,p:25000}, {c:null,p:50000}, {c:null,p:75000}, {c:null,p:100000}, {c:null,p:125000}],
+    loves:[], likes:['Phlogiston'], hates:[] }
 ];
 
 // ═══════════════════════════════════════════════════════════════════════
