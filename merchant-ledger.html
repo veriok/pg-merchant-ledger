@@ -1,0 +1,1477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Merchant's Ledger — Project Gorgon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #0f0d0a; --bg2: #1a160f; --bg3: #221c13; --bg4: #2a2015;
+  --border:   #3a2e1c; --border2: #5a4422;
+  --gold:     #c8922a; --gold2: #e8b84b; --gold-dim: #7a5515;
+  --amber:    #d4700a;
+  --text:     #d9c9a8; --text-dim: #8a7a5a; --text-muted: #5a4e34;
+  --green:    #5a8a3a; --green2: #7ab055;
+  --red:      #8a3a2a; --red2: #c05040;
+  --blue:     #2a5888; --blue2: #4a88c8;
+  --radius:   4px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Crimson Text', Georgia, serif;
+  font-size: 16px;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(200,146,42,0.07) 0%, transparent 60%),
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255,255,255,0.004) 40px, rgba(255,255,255,0.004) 41px);
+}
+::-webkit-scrollbar { width: 6px; } ::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+
+/* HEADER */
+header {
+  border-bottom: 1px solid var(--border2);
+  padding: 14px 20px 12px;
+  display: flex; align-items: baseline; gap: 16px;
+  background: linear-gradient(to bottom, rgba(25,18,8,0.95), transparent);
+  position: sticky; top: 0; z-index: 100; backdrop-filter: blur(4px);
+}
+header h1 { font-family:'Cinzel',serif; font-size:1.4rem; font-weight:700; color:var(--gold2);
+  letter-spacing:0.04em; text-shadow:0 0 18px rgba(200,146,42,0.4); white-space:nowrap; }
+header h1 span { color:var(--text-dim); font-weight:400; font-size:0.82rem; letter-spacing:0.1em; font-family:'Crimson Text',serif; font-style:italic; }
+
+/* TABS */
+.tabs { display:flex; border-bottom:1px solid var(--border); padding:0 20px; background:var(--bg2); }
+.tab-btn { font-family:'Cinzel',serif; font-size:0.76rem; letter-spacing:0.08em; color:var(--text-muted);
+  background:none; border:none; border-bottom:2px solid transparent; padding:11px 18px; cursor:pointer;
+  transition:color .2s,border-color .2s; text-transform:uppercase; }
+.tab-btn:hover { color:var(--text-dim); }
+.tab-btn.active { color:var(--gold); border-bottom-color:var(--gold); }
+
+/* PANELS */
+.panel { display:none; padding:16px 20px; max-width:1400px; margin:0 auto; }
+.panel.active { display:block; }
+
+/* TOOLBAR */
+.toolbar { display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap; align-items:center; }
+.toolbar-label { font-size:0.85rem; color:var(--text-dim); font-style:italic; }
+select.ctrl-select {
+  background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 10px;
+  border-radius:var(--radius); font-family:'Crimson Text',serif; font-size:0.92rem; cursor:pointer; outline:none;
+  transition:border-color .2s;
+}
+select.ctrl-select:focus { border-color:var(--gold-dim); }
+input.ctrl-input {
+  background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:6px 10px;
+  border-radius:var(--radius); font-family:'Crimson Text',serif; font-size:0.92rem; outline:none;
+  transition:border-color .2s; min-width:180px;
+}
+input.ctrl-input::placeholder { color:var(--text-muted); }
+input.ctrl-input:focus { border-color:var(--gold-dim); }
+.ctrl-btn {
+  background:var(--bg3); border:1px solid var(--border); color:var(--text-dim); padding:6px 12px;
+  border-radius:var(--radius); font-family:'Cinzel',serif; font-size:0.68rem; letter-spacing:0.05em;
+  cursor:pointer; transition:all .15s; text-transform:uppercase; white-space:nowrap;
+}
+.ctrl-btn:hover { border-color:var(--border2); color:var(--text); }
+.ctrl-btn.active { background:var(--gold-dim); border-color:var(--gold); color:var(--gold2); }
+.ctrl-btn.fav-active { background:rgba(210,160,30,0.18); border-color:var(--gold); color:var(--gold2); }
+.ctrl-btn.beast-active { background:rgba(90,138,58,0.18); border-color:var(--green); color:var(--green2); }
+.ml-auto { margin-left:auto; }
+
+/* VENDOR GRID */
+.vendor-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(320px,1fr)); gap:8px; }
+.vendor-card {
+  background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius);
+  padding:0; overflow:hidden; transition:border-color .15s;
+}
+.vendor-card:hover { border-color:var(--border2); }
+.vendor-card.is-favorite { border-color:rgba(200,146,42,0.35); }
+.vendor-card.sold-out { opacity:0.5; }
+.vendor-card.reduced { border-color:rgba(138,58,42,0.4); }
+
+.vc-head {
+  display:flex; align-items:center; gap:8px; padding:8px 10px;
+  background:var(--bg3); border-bottom:1px solid var(--border);
+}
+.fav-star { background:none; border:none; font-size:1.1rem; cursor:pointer; color:var(--text-muted);
+  padding:0; line-height:1; transition:color .15s; flex-shrink:0; }
+.fav-star.on { color:var(--gold); }
+.vc-name { font-family:'Cinzel',serif; font-size:0.85rem; font-weight:600; color:var(--text); flex:1; min-width:0;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.vc-region { font-size:0.72rem; color:var(--text-muted); flex-shrink:0; }
+.favor-ctrl { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+.favor-btn { background:none; border:1px solid var(--border); color:var(--text-dim); width:20px; height:20px;
+  border-radius:2px; cursor:pointer; font-size:0.7rem; display:flex; align-items:center; justify-content:center;
+  transition:all .15s; padding:0; }
+.favor-btn:hover { border-color:var(--gold-dim); color:var(--gold); }
+.favor-badge {
+  font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.04em; padding:2px 6px;
+  border-radius:2px; border:1px solid; white-space:nowrap;
+}
+.fl-0 { color:var(--text-muted); border-color:var(--border); background:transparent; }
+.fl-1 { color:var(--text-dim); border-color:var(--border2); background:rgba(58,46,28,0.4); }
+.fl-2 { color:var(--gold-dim); border-color:rgba(122,85,21,0.6); background:rgba(122,85,21,0.12); }
+.fl-3 { color:var(--gold); border-color:rgba(200,146,42,0.6); background:rgba(200,146,42,0.12); }
+.fl-4 { color:var(--gold2); border-color:rgba(232,184,75,0.6); background:rgba(232,184,75,0.12); }
+.fl-5 { color:var(--amber); border-color:rgba(212,112,10,0.6); background:rgba(212,112,10,0.12); }
+.fl-6 { color:#ff9944; border-color:rgba(255,153,68,0.7); background:rgba(255,153,68,0.15); }
+
+.vc-meta { display:flex; align-items:center; gap:8px; padding:6px 10px 4px; flex-wrap:wrap; }
+.vc-location { font-size:0.8rem; color:var(--text-dim); flex:1; min-width:0; font-style:italic; }
+.beast-badge { font-size:0.7rem; padding:1px 6px; border-radius:2px; font-family:'Cinzel',serif;
+  letter-spacing:0.03em; flex-shrink:0; }
+.beast-yes { background:rgba(90,138,58,0.2); border:1px solid rgba(90,138,58,0.4); color:var(--green2); }
+.beast-no  { background:rgba(90,58,42,0.2); border:1px solid rgba(90,58,42,0.4); color:var(--text-muted); }
+
+.vc-types { display:flex; flex-wrap:wrap; gap:4px; padding:4px 10px 6px; }
+.type-tag { font-family:'Cinzel',serif; font-size:0.58rem; letter-spacing:0.04em; padding:2px 6px;
+  border-radius:2px; background:rgba(122,85,21,0.15); border:1px solid rgba(122,85,21,0.35); color:var(--gold-dim); }
+.type-tag.reduced-tag { background:rgba(138,58,42,0.2); border-color:rgba(200,80,60,0.4); color:#c05040; }
+.no-buy { font-size:0.78rem; color:var(--text-muted); font-style:italic; padding:0 10px 6px; }
+
+.vc-limits { display:flex; gap:12px; padding:4px 10px; border-top:1px solid var(--border);
+  background:rgba(0,0,0,0.15); }
+.limit-item { font-size:0.8rem; }
+.limit-item .ll { color:var(--text-muted); }
+.limit-item .lv { color:var(--gold-dim); font-weight:600; }
+
+.vc-cash { display:flex; align-items:center; gap:8px; padding:8px 10px; flex-wrap:wrap; }
+.cash-label { font-size:0.8rem; color:var(--text-dim); white-space:nowrap; }
+.cash-input {
+  background:var(--bg); border:1px solid var(--border); color:var(--text); padding:4px 8px;
+  border-radius:var(--radius); font-family:'Crimson Text',serif; font-size:0.92rem; width:90px;
+  outline:none; transition:border-color .2s; text-align:right;
+}
+.cash-input:focus { border-color:var(--gold-dim); }
+.cash-input::-webkit-inner-spin-button,
+.cash-input::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+.cash-input[type=number] { -moz-appearance:textfield; }
+.cash-of { font-size:0.78rem; color:var(--text-muted); }
+.timer-display { font-family:'Cinzel',serif; font-size:0.68rem; letter-spacing:0.04em;
+  padding:2px 8px; border-radius:2px; white-space:nowrap; }
+.timer-active { background:rgba(32,88,136,0.2); border:1px solid rgba(74,136,200,0.4); color:var(--blue2); }
+.timer-done  { background:rgba(90,138,58,0.2); border:1px solid rgba(122,176,85,0.5); color:var(--green2); }
+.timer-none  { color:var(--text-muted); font-size:0.75rem; }
+.warn-tag { background:rgba(138,58,42,0.25); border:1px solid rgba(200,80,60,0.5); color:#e08060;
+  font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.04em; padding:2px 6px; border-radius:2px; }
+
+.no-vendors { grid-column:1/-1; text-align:center; color:var(--text-muted); font-style:italic; padding:40px; }
+
+/* GIFTING PANEL */
+.gift-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px,1fr)); gap:10px; }
+.gift-card { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+.gift-card.is-favorite { border-color:rgba(200,146,42,0.35); }
+.gc-head { display:flex; align-items:center; gap:8px; padding:8px 10px;
+  background:var(--bg3); border-bottom:1px solid var(--border); }
+.gc-name { font-family:'Cinzel',serif; font-size:0.85rem; font-weight:600; color:var(--text); flex:1; }
+.gc-region { font-size:0.72rem; color:var(--text-muted); }
+
+.gc-talk { padding:8px 10px; font-size:0.85rem; line-height:1.7; }
+.talk-loves { color:var(--gold); } .talk-likes { color:var(--green2); } .talk-hates { color:var(--red2); }
+.talk-label { font-family:'Cinzel',serif; font-size:0.62rem; letter-spacing:0.05em; color:var(--text-muted); margin-right:4px; }
+
+details.gift-details { border-top:1px solid var(--border); }
+details.gift-details summary {
+  padding:7px 10px; cursor:pointer; font-family:'Cinzel',serif; font-size:0.7rem;
+  letter-spacing:0.07em; color:var(--gold-dim); text-transform:uppercase; user-select:none;
+  list-style:none; display:flex; align-items:center; gap:6px;
+}
+details.gift-details summary::-webkit-details-marker { display:none; }
+details.gift-details summary::before { content:'▶'; font-size:0.6rem; transition:transform .15s; }
+details.gift-details[open] summary::before { transform:rotate(90deg); }
+details.gift-details summary .favor-at { margin-left:auto; font-family:'Cinzel',serif; font-size:0.6rem; }
+
+.gift-table-wrap { padding:0 10px 10px; }
+.gift-table { width:100%; border-collapse:collapse; font-size:0.82rem; }
+.gift-table th { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.06em; text-transform:uppercase;
+  color:var(--text-muted); padding:4px 4px 6px; border-bottom:1px solid var(--border); text-align:left; }
+.gift-table th.num { text-align:right; }
+.gift-table td { padding:3px 4px; border-bottom:1px solid rgba(58,46,28,0.4); vertical-align:middle; }
+.gift-table tr:last-child td { border-bottom:none; }
+.gi-name { background:transparent; border:1px solid transparent; color:var(--text); padding:2px 4px;
+  font-family:'Crimson Text',serif; font-size:0.88rem; width:100%; border-radius:2px;
+  transition:border-color .15s; outline:none; }
+.gi-name:focus { border-color:var(--border2); background:var(--bg3); }
+.gi-val { background:transparent; border:1px solid transparent; color:var(--gold-dim); padding:2px 4px;
+  font-family:'Crimson Text',serif; font-size:0.88rem; width:60px; text-align:right; border-radius:2px;
+  transition:border-color .15s; outline:none; }
+.gi-val:focus { border-color:var(--border2); background:var(--bg3); }
+.gi-calc { color:var(--text-muted); font-size:0.78rem; text-align:right; white-space:nowrap; }
+.gi-del { background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:0.8rem; padding:0 2px;
+  transition:color .15s; }
+.gi-del:hover { color:var(--red2); }
+.btn-add-gift { background:none; border:1px dashed var(--border2); color:var(--text-muted); padding:4px 10px;
+  border-radius:var(--radius); cursor:pointer; font-family:'Cinzel',serif; font-size:0.65rem;
+  letter-spacing:0.06em; margin-top:6px; width:100%; transition:all .15s; text-transform:uppercase; }
+.btn-add-gift:hover { border-color:var(--gold-dim); color:var(--gold-dim); }
+.gift-note { font-size:0.72rem; color:var(--text-muted); font-style:italic; margin-top:4px; }
+
+/* MANAGE PANEL */
+.manage-layout { display:grid; grid-template-columns:1fr 360px; gap:16px; }
+@media(max-width:800px) { .manage-layout { grid-template-columns:1fr; } }
+.section-title { font-family:'Cinzel',serif; font-size:0.8rem; letter-spacing:0.1em; color:var(--gold);
+  text-transform:uppercase; border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:12px; }
+.manage-vendor-list { display:flex; flex-direction:column; gap:6px; }
+details.mv-detail { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); }
+details.mv-detail summary { padding:8px 12px; cursor:pointer; display:flex; align-items:center; gap:8px;
+  user-select:none; list-style:none; }
+details.mv-detail summary::-webkit-details-marker { display:none; }
+details.mv-detail summary::before { content:'▶'; font-size:0.6rem; color:var(--text-muted); flex-shrink:0; transition:transform .15s; }
+details.mv-detail[open] summary::before { transform:rotate(90deg); }
+.mv-name { font-family:'Cinzel',serif; font-size:0.82rem; color:var(--text); flex:1; }
+.mv-region-tag { font-size:0.7rem; color:var(--text-muted); }
+.mv-content { padding:10px 12px; border-top:1px solid var(--border); }
+.buy-types-table { width:100%; border-collapse:collapse; margin-bottom:8px; }
+.buy-types-table th { font-family:'Cinzel',serif; font-size:0.6rem; letter-spacing:0.06em; color:var(--text-muted);
+  padding:3px 4px 6px; border-bottom:1px solid var(--border); text-align:left; text-transform:uppercase; }
+.buy-types-table td { padding:3px 4px; border-bottom:1px solid rgba(58,46,28,0.3); font-size:0.85rem; }
+.bt-type { color:var(--text); }
+.bt-mult-input { background:var(--bg3); border:1px solid var(--border); color:var(--gold-dim);
+  padding:2px 6px; width:70px; text-align:right; border-radius:2px; font-family:'Crimson Text',serif;
+  font-size:0.88rem; outline:none; transition:border-color .15s; }
+.bt-mult-input:focus { border-color:var(--gold-dim); }
+.bt-del { background:none; border:none; color:var(--text-muted); cursor:pointer; padding:0 4px; }
+.bt-del:hover { color:var(--red2); }
+.btn-add-type { background:none; border:1px dashed var(--border2); color:var(--text-muted); padding:3px 10px;
+  border-radius:var(--radius); cursor:pointer; font-family:'Cinzel',serif; font-size:0.62rem;
+  letter-spacing:0.06em; transition:all .15s; text-transform:uppercase; }
+.btn-add-type:hover { border-color:var(--gold-dim); color:var(--gold-dim); }
+.add-type-row { display:flex; gap:6px; margin-top:6px; flex-wrap:wrap; }
+
+.manage-side { display:flex; flex-direction:column; gap:14px; }
+.side-box { background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:14px; }
+.btn-primary { background:var(--gold-dim); border:1px solid var(--gold); color:var(--gold2); padding:8px 18px;
+  border-radius:var(--radius); font-family:'Cinzel',serif; font-size:0.72rem; letter-spacing:0.06em;
+  cursor:pointer; transition:all .2s; text-transform:uppercase; display:inline-block; }
+.btn-primary:hover { background:rgba(122,85,21,0.8); }
+.side-desc { font-size:0.88rem; color:var(--text-dim); font-style:italic; margin-bottom:10px; line-height:1.5; }
+textarea.mgmt-ta { width:100%; height:100px; background:var(--bg3); border:1px solid var(--border);
+  color:var(--text); padding:8px; border-radius:var(--radius); font-family:'Crimson Text',serif;
+  font-size:0.85rem; resize:vertical; outline:none; transition:border-color .2s; }
+textarea.mgmt-ta:focus { border-color:var(--gold-dim); }
+.result-msg { margin-top:8px; padding:6px 10px; border-radius:var(--radius); font-size:0.85rem; display:none; }
+.result-ok  { background:rgba(90,138,58,0.15); border:1px solid rgba(90,138,58,0.4); color:var(--green2); display:block; }
+.result-err { background:rgba(138,58,42,0.15); border:1px solid rgba(138,58,42,0.4); color:var(--red2); display:block; }
+.sep { border:none; border-top:1px solid var(--border); margin:12px 0; }
+
+/* FOOTER */
+footer { border-top:1px solid var(--border); padding:10px 20px; font-size:0.76rem; color:var(--text-muted);
+  font-style:italic; display:flex; justify-content:space-between; align-items:center; }
+footer a { color:var(--gold-dim); text-decoration:none; }
+footer a:hover { color:var(--gold); }
+
+/* TIMER MODAL */
+.modal-overlay {
+  position:fixed; inset:0; background:rgba(0,0,0,0.7); z-index:200;
+  display:flex; align-items:center; justify-content:center; backdrop-filter:blur(2px);
+}
+.modal-box {
+  background:var(--bg2); border:1px solid var(--border2); border-radius:var(--radius);
+  padding:20px 24px; min-width:300px; max-width:380px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.6);
+}
+.modal-title { font-family:'Cinzel',serif; font-size:0.85rem; letter-spacing:0.08em; color:var(--gold);
+  text-transform:uppercase; margin-bottom:14px; }
+.modal-label { font-size:0.85rem; color:var(--text-dim); margin-bottom:6px; display:block; }
+.modal-input { background:var(--bg3); border:1px solid var(--border); color:var(--text); padding:7px 10px;
+  border-radius:var(--radius); font-family:'Crimson Text',serif; font-size:0.95rem; width:100%;
+  outline:none; transition:border-color .2s; margin-bottom:12px; }
+.modal-input:focus { border-color:var(--gold-dim); }
+.modal-actions { display:flex; gap:8px; justify-content:flex-end; margin-top:4px; }
+.modal-btn { background:var(--bg3); border:1px solid var(--border); color:var(--text-dim); padding:6px 14px;
+  border-radius:var(--radius); font-family:'Cinzel',serif; font-size:0.68rem; letter-spacing:0.05em;
+  cursor:pointer; transition:all .15s; text-transform:uppercase; }
+.modal-btn:hover { border-color:var(--border2); color:var(--text); }
+.modal-btn.primary { background:var(--gold-dim); border-color:var(--gold); color:var(--gold2); }
+.modal-btn.primary:hover { background:rgba(122,85,21,0.8); }
+.modal-btn.danger { border-color:var(--red); color:var(--red2); }
+.timer-display { cursor:pointer; }
+.timer-display:hover { opacity:0.8; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Merchant's Ledger <span>— Project Gorgon</span></h1>
+</header>
+
+<nav class="tabs">
+  <button class="tab-btn active" data-tab="selling">⚔ Selling</button>
+  <button class="tab-btn" data-tab="gifting">♥ Gifting</button>
+  <button class="tab-btn" data-tab="manage">⚙ Manage</button>
+</nav>
+
+<!-- SELLING -->
+<div class="panel active" id="panel-selling">
+  <div class="toolbar">
+    <select class="ctrl-select" id="sel-type">
+      <option value="all">All Item Types</option>
+      <option value="Food">🍖 Food</option>
+      <option value="Potions">⚗ Potions</option>
+      <option value="Phlog">✨ Phlog</option>
+      <option value="Gems">💎 Gems</option>
+      <option value="Tools">🔧 Tools</option>
+      <option value="Skins">🦊 Skins</option>
+      <option value="Leather">📜 Leather</option>
+      <option value="Equipment">⚔ Equipment</option>
+      <option value="Jewelry">💍 Jewelry</option>
+      <option value="Monster Parts">💀 Monster Parts</option>
+    </select>
+    <button class="ctrl-btn" id="btn-fav-only">★ Fav Only</button>
+    <button class="ctrl-btn" id="btn-beast-only">🐾 Beast Speech</button>
+    <button class="ctrl-btn" id="btn-hide-empty">Hide Sold Out</button>
+    <span class="toolbar-label">Sort:</span>
+    <button class="ctrl-btn sort-btn active" data-sort="name">Name</button>
+    <button class="ctrl-btn sort-btn" data-sort="location">Region</button>
+    <button class="ctrl-btn sort-btn" data-sort="cash">Cash ↓</button>
+  </div>
+  <div class="vendor-grid" id="vendor-grid"></div>
+</div>
+
+<!-- GIFTING -->
+<div class="panel" id="panel-gifting">
+  <div class="toolbar">
+    <input class="ctrl-input" type="text" id="gift-search" placeholder="Search by item tag (e.g. Mushroom, Gem…)">
+    <button class="ctrl-btn" id="btn-gift-fav">★ Fav Only</button>
+    <span class="toolbar-label ml-auto" style="font-size:0.78rem">Estimates assume starting from 0 within current level.</span>
+  </div>
+  <div class="gift-grid" id="gift-grid"></div>
+</div>
+
+<!-- MANAGE -->
+<div class="panel" id="panel-manage">
+  <div class="manage-layout">
+    <div>
+      <div class="section-title">Vendor Buy Types & Multipliers</div>
+      <div class="manage-vendor-list" id="manage-list"></div>
+    </div>
+    <div class="manage-side">
+      <div class="side-box">
+        <div class="section-title">Export Favor Data</div>
+        <p class="side-desc">Save your favor levels to share across devices. Only favor levels are exported.</p>
+        <button class="btn-primary" id="btn-export-favor">Export Favor Levels</button>
+      </div>
+      <div class="side-box">
+        <div class="section-title">Import Favor Data</div>
+        <p class="side-desc">Paste previously exported JSON to restore favor levels.</p>
+        <textarea class="mgmt-ta" id="ta-import" placeholder='{"version":1,"vendors":{…}}'></textarea>
+        <br><button class="btn-primary" id="btn-import-favor" style="margin-top:8px">Import</button>
+        <div class="result-msg" id="import-result"></div>
+      </div>
+      <div class="side-box">
+        <div class="section-title">Danger Zone</div>
+        <p class="side-desc">Clear all saved data (favor, cash, timers, gift tables).</p>
+        <button class="ctrl-btn" id="btn-reset-all" style="border-color:var(--red);color:var(--red2)">Clear All Data</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <span>Data from <a href="https://wiki.projectgorgon.com/wiki/Merchants" target="_blank">Project Gorgon Wiki</a>. Saved locally in your browser.</span>
+  <span id="last-saved"></span>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════════════
+const FAVOR_LEVELS = ['Neutral','Comfortable','Friends','Close Friends','Best Friends','Like Family','Soul Mates'];
+const FAVOR_STEP   = [100, 200, 300, 600, 800, 1000];  // favor to go from level i to i+1
+const ITEM_TYPES   = ['Food','Potions','Phlog','Gems','Tools','Skins','Leather','Equipment','Jewelry','Monster Parts'];
+const TYPE_ICON    = {Food:'🍖',Potions:'⚗',Phlog:'✨',Gems:'💎',Tools:'🔧',Skins:'🦊',Leather:'📜',Equipment:'⚔',Jewelry:'💍','Monster Parts':'💀'};
+const SEVEN_DAYS   = 7 * 24 * 60 * 60 * 1000;
+const REGION_ICON  = {Serbule:'🏰',Eltibule:'🗺',Kur:'⛰','Kur Mountains':'⛰','Sun Vale':'☀','Rahu':'🏛'};
+
+// limits array index matches FAVOR_LEVELS index
+// {c: capPerItem, p: weeklyPool}  null = unknown/won't buy at that level
+const VENDORS_DATA = [
+  { id:"azalak", name:"Azalak", region:"Serbule", location:"Serbule", beastSpeak:true,
+    buyTypes:[{t:"Potions",m:100}, {t:"Skins",m:100}],
+    limits:[{c:null,p:null}, {c:null,p:null}, {c:null,p:25000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:35000}, {c:null,p:35000}],
+    loves:["Gems", "Flowers", "Books", "Head Gear"], likes:[], hates:[] },
+
+  { id:"charles_thompson", name:"Charles Thompson", region:"Serbule", location:"Serbule", beastSpeak:false,
+    buyTypes:[],
+    limits:[{c:null,p:null}, {c:150,p:7500}, {c:636,p:35000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:45000}, {c:null,p:60000}],
+    loves:["Mushrooms of all Types", "Combat Beakers and Flasks", "Rare Alchemy Recipes"], likes:[], hates:[] },
+
+  { id:"elahil", name:"Elahil", region:"Serbule", location:"Serbule", beastSpeak:false,
+    buyTypes:[{t:"Equipment",m:100}],
+    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1300,p:65000}],
+    loves:["Magical Bows"], likes:["Prepared Food", "Rings"], hates:["Drugs"] },
+
+  { id:"fainor", name:"Fainor", region:"Serbule", location:"Serbule", beastSpeak:true,
+    buyTypes:[{t:"Food",m:100}],
+    limits:[{c:50,p:2500}, {c:50,p:2500}, {c:400,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:500,p:25000}, {c:null,p:30000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"flia", name:"Flia", region:"Serbule", location:"Serbule", beastSpeak:true,
+    buyTypes:[],
+    limits:[{c:null,p:null}, {c:200,p:10000}, {c:1600,p:80000}, {c:null,p:null}, {c:null,p:null}, {c:2000,p:100000}, {c:2400,p:120000}],
+    loves:["Rare Recipes and Knowledge", "Items With Interesting History"], likes:["Potions"], hates:["Food"] },
+
+  { id:"harry_the_wolf", name:"Harry the Wolf", region:"Serbule", location:"Serbule", beastSpeak:true,
+    buyTypes:[{t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Phlog",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:75,p:3750}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"hulon", name:"Hulon", region:"Serbule", location:"Serbule", beastSpeak:true,
+    buyTypes:[],
+    limits:[{c:100,p:5000}, {c:119,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1200,p:60000}],
+    loves:["Seeds", "Seedlings"], likes:["Prepared Food", "Cooking Recipes"], hates:["Poetry"] },
+
+  { id:"joeh", name:"Joeh", region:"Serbule", location:"Serbule", beastSpeak:false,
+    buyTypes:[{t:"Equipment",m:100}],
+    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1200,p:60000}],
+    loves:["Swords", "Shields"], likes:[], hates:["Jewelry"] },
+
+  { id:"larsan", name:"Larsan", region:"Serbule", location:"Serbule", beastSpeak:true,
+    buyTypes:[{t:"Gems",m:100}, {t:"Jewelry",m:100}],
+    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1000,p:50000}],
+    loves:["Fancy Rings", "Precious Gems", "Figurines"], likes:[], hates:[] },
+
+  { id:"leonard_allenson", name:"Leonard Allenson", region:"Serbule", location:"Serbule", beastSpeak:true,
+    buyTypes:[],
+    limits:[{c:200,p:10000}, {c:200,p:10000}, {c:1600,p:80000}, {c:null,p:null}, {c:null,p:null}, {c:2000,p:100000}, {c:2400,p:120000}],
+    loves:["Equipment with Battle Chemistry prerequisites"], likes:[], hates:[] },
+
+  { id:"marna", name:"Marna", region:"Serbule", location:"Serbule", beastSpeak:false,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:500,p:2000}, {c:500,p:2000}, {c:800,p:3200}, {c:null,p:null}, {c:null,p:null}, {c:900,p:3600}, {c:1000,p:4000}],
+    loves:["Rare Recipes", "Vegetarian Food", "Fire Staves"], likes:["Animal Skins"], hates:["Meat"] },
+
+  { id:"mushroom_jack", name:"Mushroom Jack", region:"Serbule", location:"Serbule", beastSpeak:true,
+    buyTypes:[],
+    limits:[{c:null,p:null}, {c:null,p:null}, {c:400,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:60000}],
+    loves:["Body Parts"], likes:["Miscellaneous Junk"], hates:[] },
+
+  { id:"roshun_the_traitor", name:"Roshun the Traitor", region:"Serbule", location:"Serbule", beastSpeak:true,
+    buyTypes:[{t:"Equipment",m:100}, {t:"Jewelry",m:100}],
+    limits:[{c:150,p:5000}, {c:150,p:7500}, {c:null,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:65000}, {c:null,p:75000}],
+    loves:["Staves", "Orcish Cultural Artifacts", "Gur-Horta"], likes:[], hates:["Nature"] },
+
+  { id:"sir_coth", name:"Sir Coth", region:"Serbule", location:"Serbule", beastSpeak:false,
+    buyTypes:[{t:"Food",m:100}, {t:"Monster Parts",m:100}, {t:"Jewelry",m:100}],
+    limits:[{c:null,p:null}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1200,p:60000}],
+    loves:["All Art", "Flawless Animal Skins", "Ivory"], likes:[], hates:["Potions"] },
+
+  { id:"tadion", name:"Tadion", region:"Serbule", location:"Serbule", beastSpeak:false,
+    buyTypes:[{t:"Equipment",m:100}],
+    limits:[{c:null,p:null}, {c:null,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:60000}],
+    loves:["Good Metal Slabs (or higher)", "Ancient Coins"], likes:["Metal Armor", "Snail Shells"], hates:[] },
+
+  { id:"therese", name:"Therese", region:"Serbule", location:"Serbule", beastSpeak:true,
+    buyTypes:[{t:"Food",m:100}, {t:"Phlog",m:10}, {t:"Potions",m:10}, {t:"Gems",m:10}, {t:"Leather",m:10}, {t:"Skins",m:10}, {t:"Tools",m:10}, {t:"Equipment",m:10}, {t:"Jewelry",m:10}, {t:"Monster Parts",m:10}],
+    limits:[{c:50,p:2500}, {c:50,p:2500}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:60000}],
+    loves:["Necklaces"], likes:["Seeds"], hates:["Meat and Meat Dishes", "Fish and Fish Dishes"] },
+
+  { id:"velkort", name:"Velkort", region:"Serbule", location:"Serbule", beastSpeak:true,
+    buyTypes:[],
+    limits:[{c:null,p:null}, {c:50,p:2500}, {c:400,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:800,p:40000}, {c:1300,p:65000}],
+    loves:[], likes:[], hates:["Food"] },
+
+  { id:"sir_arif", name:"Sir Arif", region:"Serbule Crypt", location:"Serbule Crypt", beastSpeak:true,
+    buyTypes:[{t:"Food",m:100}, {t:"Potions",m:100}],
+    limits:[{c:null,p:null}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:null,p:null}],
+    loves:["Staves"], likes:["Anything Else Edible"], hates:["Fish"] },
+
+  { id:"way", name:"Way", region:"Myconian Cave", location:"Myconian Cave", beastSpeak:true,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:125,p:6250}, {c:150,p:7500}, {c:300,p:12500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:15000}, {c:null,p:17500}],
+    loves:[], likes:["Vendor Trash", "Storage Crates", "Textiles"], hates:[] },
+
+  { id:"baroness_marith_felgard", name:"Baroness Marith Felgard", region:"Serbule Hills", location:"Serbule Hills", beastSpeak:true,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:null,p:null}, {c:500,p:2000}, {c:800,p:3200}, {c:null,p:null}, {c:null,p:null}, {c:900,p:3600}, {c:1000,p:4000}],
+    loves:[], likes:["Rings", "Fashionable Clothing", "Topaz Gems"], hates:[] },
+
+  { id:"brianna_willer", name:"Brianna Willer", region:"Serbule Hills", location:"Serbule Hills", beastSpeak:true,
+    buyTypes:[{t:"Monster Parts",m:100}],
+    limits:[{c:null,p:null}, {c:null,p:null}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:25000}],
+    loves:["Dahlias", "Moss Agates", "Barrels"], likes:[], hates:[] },
+
+  { id:"cleo_conyer", name:"Cleo Conyer", region:"Serbule Hills", location:"Serbule Hills", beastSpeak:true,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:200,p:1500}, {c:300,p:3000}, {c:600,p:7500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:800,p:10500}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"durstin_tallow", name:"Durstin Tallow", region:"Serbule Hills", location:"Serbule Hills", beastSpeak:true,
+    buyTypes:[{t:"Food",m:100}],
+    limits:[{c:50,p:2500}, {c:50,p:2500}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:500,p:25000}, {c:600,p:30000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"sammie_grimspine", name:"Sammie Grimspine", region:"Serbule Hills", location:"Serbule Hills", beastSpeak:true,
+    buyTypes:[{t:"Equipment",m:100}, {t:"Jewelry",m:100}],
+    limits:[{c:50,p:2500}, {c:100,p:5000}, {c:880,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:60000}, {c:null,p:80000}],
+    loves:["Calligraphy Benches", "Grapes"], likes:["Raw Meat"], hates:[] },
+
+  { id:"paul_vaughn", name:"Paul Vaughn", region:"Serbule Hills", location:"Serbule Hills", beastSpeak:true,
+    buyTypes:[],
+    limits:[{c:50,p:2500}, {c:100,p:3750}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:600,p:30000}, {c:720,p:40000}],
+    loves:["Perfect Pieces of Wood", "Dessert Meals"], likes:["Beer"], hates:[] },
+
+  { id:"helena_veilmoor", name:"Helena Veilmoor", region:"Eltibule", location:"Eltibule", beastSpeak:true,
+    buyTypes:[{t:"Equipment",m:100}, {t:"Phlog",m:20}, {t:"Potions",m:20}, {t:"Food",m:20}, {t:"Gems",m:20}, {t:"Leather",m:20}, {t:"Skins",m:20}, {t:"Tools",m:20}, {t:"Jewelry",m:20}, {t:"Monster Parts",m:20}],
+    limits:[{c:200,p:10000}, {c:200,p:10000}, {c:1600,p:80000}, {c:null,p:null}, {c:null,p:null}, {c:2000,p:100000}, {c:2400,p:120000}],
+    loves:["Poetry", "Extremely Valuable Things", "Obsidian"], likes:[], hates:["Stupid Crap", "Gross Monster Bits"] },
+
+  { id:"hogan", name:"Hogan", region:"Eltibule", location:"Eltibule", beastSpeak:true,
+    buyTypes:[{t:"Equipment",m:100}],
+    limits:[{c:150,p:7500}, {c:150,p:7500}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:60000}, {c:null,p:80000}],
+    loves:["Staves"], likes:[], hates:[] },
+
+  { id:"jesina", name:"Jesina", region:"Eltibule", location:"Eltibule", beastSpeak:true,
+    buyTypes:[{t:"Potions",m:100}, {t:"Food",m:100}],
+    limits:[{c:200,p:10000}, {c:400,p:15000}, {c:1600,p:80000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:100000}, {c:null,p:120000}],
+    loves:["Clothing and Cloth Armor", "Paintings"], likes:["Cooking Recipes"], hates:["Grisly Monster Trophies"] },
+
+  { id:"jumjab", name:"Jumjab", region:"Eltibule", location:"Eltibule", beastSpeak:true,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:null,p:null}, {c:20,p:1000}, {c:50,p:2500}, {c:null,p:null}, {c:null,p:null}, {c:60,p:3000}, {c:null,p:3500}],
+    loves:["Hearts"], likes:["Bones", "Equipment with Necromancy Prerequisites"], hates:[] },
+
+  { id:"kalaba", name:"Kalaba", region:"Eltibule", location:"Eltibule", beastSpeak:false,
+    buyTypes:[{t:"Equipment",m:100}],
+    limits:[{c:150,p:7500}, {c:150,p:7500}, {c:null,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:75000}, {c:2000,p:100000}],
+    loves:[], likes:["Gauntlets and Gloves"], hates:[] },
+
+  { id:"kleave", name:"Kleave", region:"Eltibule", location:"Eltibule", beastSpeak:true,
+    buyTypes:[{t:"Skins",m:100}, {t:"Leather",m:100}],
+    limits:[{c:null,p:null}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:2400,p:60000}],
+    loves:["Onyx"], likes:["Skins", "Potions"], hates:["Artwork"] },
+
+  { id:"sie_antry", name:"Sie Antry", region:"Eltibule", location:"Eltibule", beastSpeak:true,
+    buyTypes:[{t:"Equipment",m:100}, {t:"Skins",m:100}, {t:"Phlog",m:100}],
+    limits:[{c:null,p:null}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:null,p:50000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"suspicious_cow", name:"Suspicious_Cow", region:"Eltibule", location:"Eltibule", beastSpeak:true,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:50,p:2500}, {c:75,p:3750}, {c:150,p:7500}, {c:null,p:null}, {c:null,p:null}, {c:175,p:8750}, {c:200,p:10000}],
+    loves:["Poetry", "Extremely Valuable Things", "Obsidian"], likes:[], hates:["Stupid Crap", "Gross Monster Bits"] },
+
+  { id:"yetta", name:"Yetta", region:"Eltibule", location:"Eltibule", beastSpeak:false,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:100,p:5000}, {c:125,p:6250}, {c:200,p:10000}, {c:null,p:null}, {c:null,p:null}, {c:250,p:12500}, {c:300,p:15000}],
+    loves:["Lapis Lazuli", "Mushrooms"], likes:["Amulets"], hates:[] },
+
+  { id:"agrashab", name:"Agrashab", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
+    buyTypes:[{t:"Skins",m:100}, {t:"Equipment",m:100}],
+    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:60000}],
+    loves:["Fairy Wings", "Magic Clubs", "Ancient Coins"], likes:[], hates:["Troll Flesh"] },
+
+  { id:"eleme", name:"Eleme", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
+    buyTypes:[{t:"Equipment",m:100}],
+    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:50000}],
+    loves:["Magic Swords", "Cooked Vegetable Meals", "Winter Court Armor"], likes:[], hates:[] },
+
+  { id:"hiral", name:"Hiral", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
+    buyTypes:[{t:"Food",m:100}],
+    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:null,p:25000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"kodan", name:"Kodan", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:null,p:10000}, {c:null,p:10000}, {c:null,p:80000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:100000}, {c:null,p:null}],
+    loves:["Figurines"], likes:["Good Metal Slabs (or higher)"], hates:[] },
+
+  { id:"norbert", name:"Norbert", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
+    buyTypes:[{t:"Food",m:100}, {t:"Monster Parts",m:100}, {t:"Potions",m:100}],
+    limits:[{c:50,p:2500}, {c:null,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:60000}],
+    loves:[], likes:["Mushrooms", "Necklaces"], hates:[] },
+
+  { id:"preta", name:"Preta", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
+    buyTypes:[],
+    limits:[{c:100,p:5000}, {c:null,p:5000}, {c:500,p:25000}, {c:null,p:null}, {c:null,p:null}, {c:700,p:35000}, {c:800,p:40000}],
+    loves:["Odd Scrolls"], likes:[], hates:[] },
+
+  { id:"spot", name:"Spot", region:"Sun Vale", location:"Sun Vale", beastSpeak:false,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:null,p:2000}, {c:null,p:2000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
+    loves:[], likes:["Raw Meat", "Shiny Crystals"], hates:[] },
+
+  { id:"the_wombat", name:"The Wombat", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
+    buyTypes:[{t:"Skins",m:100}],
+    limits:[{c:25,p:1250}, {c:null,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:null}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"yavazek", name:"Yavazek", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
+    buyTypes:[{t:"Food",m:100}],
+    limits:[{c:150,p:7500}, {c:null,p:null}, {c:1300,p:60000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:80000}, {c:null,p:110000}],
+    loves:["Racial-Slot Equipment"], likes:["Restorative Potions"], hates:[] },
+
+  { id:"yogzi", name:"Yogzi", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
+    buyTypes:[{t:"Tools",m:100}],
+    limits:[{c:25,p:1250}, {c:100,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:50000}],
+    loves:["Magic Rings", "Skulls"], likes:[], hates:[] },
+
+  { id:"corey_the_croaker", name:"Corey The Croaker", region:"Winter Nexus", location:"Winter Nexus", beastSpeak:true,
+    buyTypes:[{t:"Skins",m:100}],
+    limits:[{c:null,p:5000}, {c:null,p:null}, {c:585,p:25000}, {c:null,p:null}, {c:null,p:null}, {c:819,p:35000}, {c:936,p:40000}],
+    loves:["Fairy Wings"], likes:["Weird Junk", "Cloth Armor"], hates:[] },
+
+  { id:"fazzi", name:"Fazzi", region:"Winter Nexus", location:"Winter Nexus", beastSpeak:true,
+    buyTypes:[{t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}],
+    limits:[{c:null,p:null}, {c:null,p:10000}, {c:null,p:80000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
+    loves:[], likes:["Orange and Red Gems", "Flowers"], hates:[] },
+
+  { id:"jace_soral", name:"Jace Soral", region:"Kur Mountains", location:"Kur Mountains", beastSpeak:true,
+    buyTypes:[{t:"Potions",m:100}, {t:"Phlog",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:50,p:2500}, {c:50,p:2500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:40000}, {c:500,p:60000}],
+    loves:[], likes:["Werewolf Oriented Magic Items", "Raw Fish", "Max-Health-Boosting Potions"], hates:[] },
+
+  { id:"lamashu", name:"Lamashu", region:"Kur Mountains", location:"Kur Mountains", beastSpeak:false,
+    buyTypes:[],
+    limits:[{c:null,p:10000}, {c:null,p:10000}, {c:null,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:65000}, {c:null,p:85000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"laura_neth", name:"Laura Neth", region:"Kur Mountains", location:"Kur Mountains", beastSpeak:false,
+    buyTypes:[{t:"Food",m:100}, {t:"Phlog",m:10}, {t:"Potions",m:10}, {t:"Gems",m:10}, {t:"Leather",m:10}, {t:"Skins",m:10}, {t:"Tools",m:10}, {t:"Equipment",m:10}, {t:"Jewelry",m:10}, {t:"Monster Parts",m:10}],
+    limits:[{c:50,p:2500}, {c:50,p:2500}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:65000}],
+    loves:["Anything Edible", "Desserts", "Paintings"], likes:[], hates:[] },
+
+  { id:"syndra", name:"Syndra", region:"Kur Mountains", location:"Kur Mountains", beastSpeak:true,
+    buyTypes:[],
+    limits:[{c:null,p:7500}, {c:null,p:10000}, {c:null,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:75000}],
+    loves:["Wood", "Furniture", "Leather Rolls"], likes:[], hates:[] },
+
+  { id:"ukorga", name:"Ukorga", region:"Kur Mountains", location:"Kur Mountains", beastSpeak:false,
+    buyTypes:[{t:"Equipment",m:100}, {t:"Jewelry",m:100}],
+    limits:[{c:150,p:7500}, {c:150,p:7500}, {c:null,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:75000}, {c:null,p:75000}],
+    loves:["Trophy Animal Skins", "Meaty Meals", "Ancient Coins"], likes:["Snail Shells"], hates:["Citrus"] },
+
+  { id:"glajur", name:"Glajur", region:"Kur Tower", location:"Kur Tower", beastSpeak:true,
+    buyTypes:[{t:"Monster Parts",m:100}],
+    limits:[{c:null,p:2500}, {c:null,p:2500}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:65000}],
+    loves:["Skulls of All Types", "Brains of All Types"], likes:["Cloth Armor"], hates:[] },
+
+  { id:"arlan", name:"Arlan", region:"Ilmari", location:"Ilmari", beastSpeak:false,
+    buyTypes:[{t:"Food",m:100}, {t:"Phlog",m:100}, {t:"Potions",m:100}],
+    limits:[{c:0,p:0}, {c:200,p:10000}, {c:1300,p:65000}, {c:null,p:null}, {c:null,p:null}, {c:1800,p:90000}, {c:2100,p:105000}],
+    loves:["Skulls of All Types", "Brains of All Types", "Dragon Scales"], likes:[], hates:[] },
+
+  { id:"firaki", name:"Firaki", region:"Ilmari", location:"Ilmari", beastSpeak:false,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:100,p:5000}, {c:200,p:10000}, {c:350,p:17500}, {c:null,p:null}, {c:null,p:null}, {c:400,p:20000}, {c:500,p:25000}],
+    loves:["Paintings", "Fish Dishes", "Silver Items"], likes:[], hates:[] },
+
+  { id:"lumpfuzz", name:"Lumpfuzz", region:"Ilmari", location:"Ilmari", beastSpeak:false,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:500,p:2000}, {c:null,p:null}, {c:null,p:3200}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:4000}],
+    loves:["Raw Meat", "Bounceweed", "Spleens"], likes:[], hates:[] },
+
+  { id:"selaxi", name:"Selaxi", region:"Ilmari", location:"Ilmari", beastSpeak:false,
+    buyTypes:[{t:"Food",m:100}],
+    limits:[{c:50,p:2500}, {c:100,p:5000}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
+    loves:["Piles of Raw Meat", "Ice Cores", "Bloodstones", "Exotic Cooking Recipes"], likes:[], hates:[] },
+
+  { id:"urzab", name:"Urzab", region:"Ilmari", location:"Ilmari", beastSpeak:false,
+    buyTypes:[{t:"Gems",m:100}, {t:"Jewelry",m:100}, {t:"Phlog",m:100}],
+    limits:[{c:200,p:10000}, {c:200,p:10000}, {c:1000,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:2100,p:100000}, {c:null,p:100000}],
+    loves:["Gems"], likes:["Crystals", "Jewelry"], hates:[] },
+
+  { id:"amutasa", name:"Amutasa", region:"Rahu", location:"Rahu", beastSpeak:false,
+    buyTypes:[{t:"Tools",m:100}, {t:"Gems",m:100}, {t:"Potions",m:100}],
+    limits:[{c:50,p:2500}, {c:50,p:5000}, {c:400,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:800,p:40000}, {c:1300,p:65000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"ashk_the_answerer", name:"Ashk the Answerer", region:"Rahu", location:"Rahu", beastSpeak:false,
+    buyTypes:[{t:"Equipment",m:100}, {t:"Phlog",m:100}, {t:"Skins",m:100}],
+    limits:[{c:25,p:1250}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1100,p:50000}, {c:1100,p:50000}],
+    loves:["Magic Equipment with", "Animal Horns", "Animal Stingers", "Animal Teeth"], likes:[], hates:[] },
+
+  { id:"hirochi_the_booklord", name:"Hirochi the Booklord", region:"Rahu", location:"Rahu", beastSpeak:false,
+    buyTypes:[],
+    limits:[{c:50,p:2500}, {c:null,p:7500}, {c:750,p:30000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:45000}, {c:null,p:60000}],
+    loves:["New combat textbooks (for any combat skill)"], likes:[], hates:[] },
+
+  { id:"ichin_the_ice_master", name:"Ichin the Ice Master", region:"Rahu", location:"Rahu", beastSpeak:false,
+    buyTypes:[{t:"Potions",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:50,p:2500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:45000}, {c:1200,p:60000}],
+    loves:["Mushrooms of all types", "Equipment with Ice Magic prerequisites", "Ice Cores", "Tundra Lichen"], likes:[], hates:[] },
+
+  { id:"nishika", name:"Nishika", region:"Rahu", location:"Rahu", beastSpeak:false,
+    buyTypes:[{t:"Food",m:100}],
+    limits:[{c:50,p:2500}, {c:50,p:2500}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:65000}],
+    loves:["Raw Vegetables", "Bloodstones", "Leather Armor with Archery Prerequisites"], likes:[], hates:[] },
+
+  { id:"rugen", name:"Rugen", region:"Rahu", location:"Rahu", beastSpeak:false,
+    buyTypes:[{t:"Food",m:100}],
+    limits:[{c:50,p:2500}, {c:50,p:2500}, {c:null,p:10000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:15000}, {c:null,p:null}],
+    loves:["Raw Fish", "Magic Daggers"], likes:["Paintings"], hates:[] },
+
+  { id:"sirine", name:"Sirine", region:"Rahu", location:"Rahu", beastSpeak:false,
+    buyTypes:[],
+    limits:[{c:null,p:5000}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:60000}],
+    loves:["Cheese"], likes:["Skins"], hates:[] },
+
+  { id:"wintria_irasce", name:"Wintria Irasce", region:"Rahu", location:"Rahu", beastSpeak:false,
+    buyTypes:[],
+    limits:[{c:50,p:2500}, {c:null,p:7500}, {c:750,p:30000}, {c:null,p:null}, {c:null,p:null}, {c:1125,p:45000}, {c:null,p:60000}],
+    loves:["New textbooks (for any skill EXCEPT combat skills)"], likes:[], hates:[] },
+
+  { id:"zhao", name:"Zhao", region:"Rahu", location:"Rahu", beastSpeak:false,
+    buyTypes:[],
+    limits:[{c:50,p:2500}, {c:150,p:7500}, {c:null,p:30000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:45000}, {c:null,p:null}],
+    loves:["Flower Seeds", "Paladium Ore", "Pyrite Ore"], likes:["Flowers, Arrangements & Displays"], hates:[] },
+
+  { id:"bellema_deftwhisper", name:"Bellema Deftwhisper", region:"New Prestonbule Cave", location:"New Prestonbule Cave", beastSpeak:false,
+    buyTypes:[{t:"Equipment",m:100}],
+    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:600,p:30000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:70000}],
+    loves:["Drinks", "Magic Crossbows"], likes:[], hates:[] },
+
+  { id:"rick_snapley", name:"Rick Snapley", region:"New Prestonbule Cave", location:"New Prestonbule Cave", beastSpeak:false,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:100,p:5000}, {c:200,p:10000}, {c:350,p:17500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:20000}, {c:500,p:25000}],
+    loves:["Poisons", "Poisoned Food and Drink", "Magic Knives"], likes:[], hates:[] },
+
+  { id:"sona", name:"Sona", region:"New Prestonbule Cave", location:"New Prestonbule Cave", beastSpeak:false,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Gems",m:100}],
+    limits:[{c:50,p:2500}, {c:null,p:5000}, {c:287,p:12500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:15000}, {c:null,p:null}],
+    loves:["Clothing and Cloth Armor", "Phlogiston"], likes:[], hates:[] },
+
+  { id:"eveline_rastin", name:"Eveline Rastin", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:false,
+    buyTypes:[],
+    limits:[{c:null,p:5000}, {c:null,p:5000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:60000}],
+    loves:["All Art", "Carded Cotton"], likes:[], hates:[] },
+
+  { id:"kib_the_unkillable", name:"Kib the Unkillable", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
+    buyTypes:[{t:"Equipment",m:100}],
+    limits:[{c:100,p:5000}, {c:200,p:null}, {c:1000,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:1200,p:60000}],
+    loves:["Swords", "Shields", "Fire Staves", "Trophy Animal Hides"], likes:[], hates:[] },
+
+  { id:"mandibles", name:"Mandibles", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
+    buyTypes:[],
+    limits:[{c:50,p:2500}, {c:null,p:null}, {c:null,p:35000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:70000}],
+    loves:["Cooking Recipe Scrolls", "Cooking Ingredients"], likes:[], hates:[] },
+
+  { id:"otis", name:"Otis", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:500,p:2000}, {c:500,p:2000}, {c:null,p:3500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:4000}, {c:1000,p:4500}],
+    loves:["Meat-Heavy Prepared Meals", "Clubs", "Hammers"], likes:[], hates:[] },
+
+  { id:"ragabir", name:"Ragabir", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
+    buyTypes:[{t:"Potions",m:100}, {t:"Monster Parts",m:100}, {t:"Food",m:100}],
+    limits:[{c:50,p:2500}, {c:150,p:7500}, {c:null,p:30000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:1200,p:60000}],
+    loves:["Alchemy Recipes", "Bones", "Alchemy Ingredients"], likes:[], hates:[] },
+
+  { id:"tavilak", name:"Tavilak", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
+    buyTypes:[{t:"Food",m:100}, {t:"Phlog",m:10}, {t:"Potions",m:10}, {t:"Gems",m:10}, {t:"Leather",m:10}, {t:"Skins",m:10}, {t:"Tools",m:10}, {t:"Equipment",m:10}, {t:"Jewelry",m:10}, {t:"Monster Parts",m:10}],
+    limits:[{c:50,p:2500}, {c:null,p:2500}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:60000}],
+    loves:["Fresh"], likes:[], hates:[] },
+
+  { id:"willem_fangblade", name:"Willem Fangblade", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
+    buyTypes:[{t:"Gems",m:100}, {t:"Jewelry",m:100}, {t:"Phlog",m:100}],
+    limits:[{c:200,p:10000}, {c:200,p:10000}, {c:1000,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:2000,p:100000}, {c:null,p:100000}],
+    loves:["Green Crystals", "Brass Items"], likes:[], hates:[] },
+
+  { id:"bendith_the_banished", name:"Bendith the Banished", region:"Fae Realm", location:"Fae Realm", beastSpeak:true,
+    buyTypes:[{t:"Food",m:100}, {t:"Potions",m:100}],
+    limits:[{c:50,p:2500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:60000}],
+    loves:["Brined Cheese"], likes:[], hates:[] },
+
+  { id:"felmer", name:"Felmer", region:"Fae Realm", location:"Fae Realm", beastSpeak:true,
+    buyTypes:[],
+    limits:[{c:null,p:5000}, {c:null,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
+    loves:["Enchanted Elvish Jewelry", "Enchanted Elvish-Style Armor and Weapons"], likes:[], hates:[] },
+
+  { id:"floxie", name:"Floxie", region:"Fae Realm", location:"Fae Realm", beastSpeak:true,
+    buyTypes:[],
+    limits:[{c:50,p:2500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:null}],
+    loves:["Cooked Vegetarian Meals", "Magic Bows", "Magic Crossbows"], likes:[], hates:[] },
+
+  { id:"pegast", name:"Pegast", region:"Fae Realm", location:"Fae Realm", beastSpeak:true,
+    buyTypes:[{t:"Equipment",m:100}],
+    limits:[{c:150,p:null}, {c:null,p:7500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:100000}, {c:null,p:100000}],
+    loves:["Magical Dirks", "Metal Helms", "Beer"], likes:[], hates:[] },
+
+  { id:"raina", name:"Raina", region:"Fae Realm", location:"Fae Realm", beastSpeak:true,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:500,p:10000}, {c:620,p:10000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"solgribue", name:"Solgribue", region:"Fae Realm", location:"Fae Realm", beastSpeak:true,
+    buyTypes:[{t:"Tools",m:100}, {t:"Jewelry",m:100}],
+    limits:[{c:100,p:5000}, {c:null,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1200,p:60000}],
+    loves:["Necklaces", "Rings"], likes:[], hates:[] },
+
+  { id:"dachak_the_digger", name:"Dachak the Digger", region:"Povus", location:"Povus", beastSpeak:true,
+    buyTypes:[{t:"Food",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:50,p:2500}, {c:50,p:2500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"dog_ear", name:"Dog Ear", region:"Povus", location:"Povus", beastSpeak:true,
+    buyTypes:[{t:"Potions",m:100}, {t:"Food",m:100}],
+    limits:[{c:50,p:2500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:900,p:65000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"errruka_the_benefactor", name:"Errruka the Benefactor", region:"Povus", location:"Povus", beastSpeak:false,
+    buyTypes:[{t:"Gems",m:100}, {t:"Food",m:100}],
+    limits:[{c:null,p:2500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:null}],
+    loves:["Live Frogs"], likes:["Remains of Deceased Scray"], hates:[] },
+
+  { id:"ferand_deftwhisper", name:"Ferand Deftwhisper", region:"Povus", location:"Povus", beastSpeak:false,
+    buyTypes:[],
+    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:null,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:75000}, {c:null,p:100000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"gerrux", name:"Gerrux", region:"Povus", location:"Povus", beastSpeak:false,
+    buyTypes:[{t:"Equipment",m:100}],
+    limits:[{c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:75000}, {c:null,p:100000}],
+    loves:[], likes:[], hates:[] },
+
+  { id:"tryaka", name:"Tryaka", region:"Povus", location:"Povus", beastSpeak:false,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:100,p:5000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
+    loves:[], likes:[], hates:[] }
+];
+
+// ═══════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════
+let STATE = { vendors: {} };
+
+function loadState() {
+  try { const r = localStorage.getItem('pg-merchant-ledger'); if(r) STATE = JSON.parse(r); } catch(e) {}
+}
+function saveState() {
+  try {
+    localStorage.setItem('pg-merchant-ledger', JSON.stringify(STATE));
+    const el = document.getElementById('last-saved');
+    if(el) el.textContent = 'Saved ' + new Date().toLocaleTimeString();
+  } catch(e) {}
+}
+function getVS(id) {
+  if (!STATE.vendors[id]) STATE.vendors[id] = {};
+  const s = STATE.vendors[id];
+  return {
+    favorLevel:    s.favorLevel    ?? 0,
+    isFavorite:    s.isFavorite    ?? false,
+    cashRemaining: s.cashRemaining ?? null,
+    timerStart:    s.timerStart    ?? null,
+    giftTable:     s.giftTable     ?? [],
+    buyTypes:      s.buyTypes      ?? null,  // null = use vendor defaults
+  };
+}
+function setVS(id, updates) {
+  if (!STATE.vendors[id]) STATE.vendors[id] = {};
+  Object.assign(STATE.vendors[id], updates);
+  saveState();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// TIMER
+// ═══════════════════════════════════════════════════════════════════════
+function setCash(id, cash) {
+  const s = getVS(id);
+  const now = Date.now();
+  let ts = s.timerStart;
+  if (ts === null || (ts + SEVEN_DAYS) < now) ts = now;
+  setVS(id, { cashRemaining: cash, timerStart: ts });
+}
+function getTimerMs(id) {
+  const s = getVS(id);
+  if (s.timerStart === null) return null;
+  return Math.max(0, (s.timerStart + SEVEN_DAYS) - Date.now());
+}
+function fmtTimer(ms) {
+  if (ms === null) return null;
+  if (ms === 0) return '⟳ RESET READY';
+  const d = Math.floor(ms / 86400000);
+  const h = Math.floor((ms % 86400000) / 3600000);
+  const m = Math.floor((ms % 3600000) / 60000);
+  return `${d}d ${String(h).padStart(2,'0')}h ${String(m).padStart(2,'0')}m`;
+}
+function fmtNum(n) {
+  if (n === null || n === undefined) return '?';
+  return n.toLocaleString();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════════════════════════
+let F = {
+  itemType: 'all', favOnly: false, beastOnly: false, hideEmpty: false,
+  sort: 'name', giftFavOnly: false, giftSearch: '',
+};
+
+function getEffectiveBuyTypes(vd) {
+  const s = getVS(vd.id);
+  return s.buyTypes !== null ? s.buyTypes : vd.buyTypes;
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// RENDER SELLING TAB
+// ═══════════════════════════════════════════════════════════════════════
+function renderSelling() {
+  const grid = document.getElementById('vendor-grid');
+  let vendors = VENDORS_DATA.map(vd => {
+    const s = getVS(vd.id);
+    const bt = getEffectiveBuyTypes(vd);
+    const lvl = vd.limits && vd.limits[s.favorLevel] ? vd.limits[s.favorLevel] : {c:null,p:null};
+    const pool = lvl.p;
+    const cash = s.cashRemaining;
+    const displayCash = cash !== null ? cash : pool;
+
+    // Filter by item type
+    let typeMatch = null, reducedMatch = false;
+    if (F.itemType !== 'all') {
+      const entry = bt.find(b => b.t === F.itemType);
+      if (!entry) return null;
+      typeMatch = F.itemType;
+      reducedMatch = entry.m < 100;
+    }
+
+    if (F.favOnly && !s.isFavorite) return null;
+    if (F.beastOnly && !vd.beastSpeak) return null;
+    const effectiveCash = cash !== null ? cash : pool;
+    if (F.hideEmpty && effectiveCash !== null && effectiveCash <= 100) return null;
+
+    return { vd, s, bt, lvl, pool, cash, displayCash, effectiveCash, typeMatch, reducedMatch };
+  }).filter(Boolean);
+
+  // Sort
+  if (F.sort === 'name') {
+    vendors.sort((a,b) => a.vd.name.localeCompare(b.vd.name));
+  } else if (F.sort === 'location') {
+    vendors.sort((a,b) => a.vd.region.localeCompare(b.vd.region) || a.vd.location.localeCompare(b.vd.location));
+  } else if (F.sort === 'cash') {
+    vendors.sort((a,b) => {
+      const ca = a.effectiveCash ?? Infinity;
+      const cb = b.effectiveCash ?? Infinity;
+      return cb - ca;
+    });
+  }
+
+  // Reduced price vendors go to end when type filter active
+  if (F.itemType !== 'all') {
+    vendors.sort((a,b) => (a.reducedMatch ? 1 : 0) - (b.reducedMatch ? 1 : 0));
+  }
+
+  if (!vendors.length) {
+    grid.innerHTML = '<div class="no-vendors">No vendors match your filters.</div>';
+    return;
+  }
+
+  grid.innerHTML = vendors.map(({ vd, s, bt, lvl, pool, cash, effectiveCash, reducedMatch }) => {
+    const timerMs = getTimerMs(vd.id);
+    const timerStr = fmtTimer(timerMs);
+    const isSoldOut = effectiveCash !== null && effectiveCash <= 100;
+    const flClass = `fl-${s.favorLevel}`;
+    const ri = REGION_ICON[vd.region] || '📍';
+
+    const typeTags = bt.length ? bt.map(b => {
+      const isSelected = F.itemType === b.t;
+      const cls = b.m < 100 ? 'type-tag reduced-tag' : 'type-tag';
+      return `<span class="${cls}">${TYPE_ICON[b.t]||''} ${b.t}${b.m<100?' (!'+b.m+'%)':''}</span>`;
+    }).join('') : `<span class="no-buy">Doesn't buy main item types</span>`;
+
+    const capStr  = lvl.c !== null ? fmtNum(lvl.c) : '?';
+    const poolStr = lvl.p !== null ? fmtNum(lvl.p) : '?';
+    const cashVal = cash !== null ? cash : (lvl.p !== null ? lvl.p : '');
+    const cashOfStr = lvl.p !== null ? `/ ${fmtNum(lvl.p)}` : '';
+
+    let timerHtml = '';
+    if (timerStr === null) {
+      timerHtml = `<span class="timer-display timer-none">⏱ no timer</span>`;
+    } else if (timerMs === 0) {
+      timerHtml = `<span class="timer-display timer-done">${timerStr}</span>`;
+    } else {
+      timerHtml = `<span class="timer-display timer-active">⏱ ${timerStr}</span>`;
+    }
+
+    return `<div class="vendor-card${s.isFavorite?' is-favorite':''}${isSoldOut?' sold-out':''}${reducedMatch?' reduced':''}" data-id="${vd.id}">
+      <div class="vc-head">
+        <button class="fav-star${s.isFavorite?' on':''}" data-action="fav" data-id="${vd.id}" title="Toggle favorite">★</button>
+        <span class="vc-name">${vd.name}</span>
+        <span class="vc-region">${ri} ${vd.region}</span>
+        <div class="favor-ctrl">
+          <button class="favor-btn" data-action="fav-dn" data-id="${vd.id}" title="Lower favor">▼</button>
+          <span class="favor-badge ${flClass}">${FAVOR_LEVELS[s.favorLevel]}</span>
+          <button class="favor-btn" data-action="fav-up" data-id="${vd.id}" title="Raise favor">▲</button>
+        </div>
+      </div>
+      <div class="vc-meta">
+        <span class="vc-location">📍 ${vd.location}</span>
+        <span class="beast-badge ${vd.beastSpeak?'beast-yes':'beast-no'}">${vd.beastSpeak?'🐾 Beast Speech':'✗ Beast Speech'}</span>
+      </div>
+      <div class="vc-types">${typeTags}</div>
+      <div class="vc-limits">
+        <span class="limit-item"><span class="ll">Item Cap: </span><span class="lv">${capStr}</span></span>
+        <span class="limit-item"><span class="ll">Pool: </span><span class="lv">${poolStr}</span></span>
+        ${reducedMatch ? '<span class="warn-tag">⚠ REDUCED PRICE</span>' : ''}
+      </div>
+      <div class="vc-cash">
+        <span class="cash-label">Cash left:</span>
+        <input class="cash-input" type="number" data-id="${vd.id}" value="${cashVal}" placeholder="—" min="0">
+        <span class="cash-of">${cashOfStr}</span>
+        ${timerHtml}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// RENDER GIFTING TAB
+// ═══════════════════════════════════════════════════════════════════════
+function renderGifting() {
+  const grid = document.getElementById('gift-grid');
+  const search = F.giftSearch.toLowerCase();
+
+  const vendors = VENDORS_DATA.filter(vd => {
+    const s = getVS(vd.id);
+    if (F.giftFavOnly && !s.isFavorite) return false;
+    if (search) {
+      const combined = [...vd.loves, ...vd.likes].join(' ').toLowerCase();
+      const gt = s.giftTable.map(r => r.name || '').join(' ').toLowerCase();
+      if (!combined.includes(search) && !gt.includes(search)) return false;
+    }
+    return true;
+  });
+
+  if (!vendors.length) {
+    grid.innerHTML = '<div class="no-vendors">No NPCs match. Try a different search or toggle favorites off.</div>';
+    return;
+  }
+
+  grid.innerHTML = vendors.map(vd => {
+    const s = getVS(vd.id);
+    const fl = s.favorLevel;
+    const ri = REGION_ICON[vd.region] || '📍';
+
+    const talkHtml = [
+      vd.loves.length ? `<div><span class="talk-label">LOVES</span><span class="talk-loves">${vd.loves.join(', ')}</span></div>` : '',
+      vd.likes.length ? `<div><span class="talk-label">LIKES</span><span class="talk-likes">${vd.likes.join(', ')}</span></div>` : '',
+      vd.hates.length ? `<div><span class="talk-label">HATES</span><span class="talk-hates">${vd.hates.join(', ')}</span></div>` : '',
+    ].filter(Boolean).join('');
+
+    const toNext = fl < 6 ? FAVOR_STEP[fl] : null;
+    const toSM   = fl < 6 ? FAVOR_STEP.slice(fl).reduce((a,b)=>a+b,0) : null;
+
+    const tableRows = (s.giftTable || []).map((row, i) => {
+      const val = parseFloat(row.value) || 0;
+      let nextCell = '—', smCell = '—';
+      if (val > 0 && toNext !== null) nextCell = Math.ceil(toNext / val).toLocaleString();
+      if (val > 0 && toSM !== null)   smCell   = Math.ceil(toSM   / val).toLocaleString();
+      return `<tr data-vid="${vd.id}" data-idx="${i}">
+        <td><input class="gi-name" data-vid="${vd.id}" data-idx="${i}" data-field="name" value="${esc(row.name||'')}" placeholder="Item name…"></td>
+        <td><input class="gi-val" data-vid="${vd.id}" data-idx="${i}" data-field="value" type="number" value="${row.value||''}" placeholder="0"></td>
+        <td class="gi-calc">${nextCell}</td>
+        <td class="gi-calc">${smCell}</td>
+        <td><button class="gi-del" data-vid="${vd.id}" data-idx="${i}" title="Remove">✕</button></td>
+      </tr>`;
+    }).join('');
+
+    const nextStr = toNext !== null ? `Next (${FAVOR_LEVELS[fl+1]}): ${fmtNum(toNext)} favor` : 'Soul Mates reached';
+    const smStr   = toSM   !== null ? `Soul Mates: ${fmtNum(toSM)} favor total` : '';
+
+    return `<div class="gift-card${s.isFavorite?' is-favorite':''}" data-id="${vd.id}">
+      <div class="gc-head">
+        <button class="fav-star${s.isFavorite?' on':''}" data-action="fav" data-id="${vd.id}">★</button>
+        <span class="gc-name">${vd.name}</span>
+        <span class="favor-badge fl-${fl}" style="font-size:0.6rem">${FAVOR_LEVELS[fl]}</span>
+        <span class="gc-region">${ri} ${vd.region}</span>
+      </div>
+      ${talkHtml ? `<div class="gc-talk">${talkHtml}</div>` : ''}
+      <details class="gift-details">
+        <summary>Gift Table <span class="favor-at">${nextStr}${smStr?' · '+smStr:''}</span></summary>
+        <div class="gift-table-wrap">
+          ${tableRows || s.giftTable.length===0 ? '' : ''}
+          <table class="gift-table">
+            <thead><tr>
+              <th>Item</th><th>Favor</th>
+              <th class="num" title="Items for next level">→Next</th>
+              <th class="num" title="Items for Soul Mates">→SM</th>
+              <th></th>
+            </tr></thead>
+            <tbody>${tableRows}</tbody>
+          </table>
+          <button class="btn-add-gift" data-vid="${vd.id}">+ Add Item</button>
+          ${s.giftTable.length > 0 ? `<div class="gift-note">Estimates assume 0 favor within current level (${FAVOR_LEVELS[fl]}).</div>` : ''}
+        </div>
+      </details>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// RENDER MANAGE TAB
+// ═══════════════════════════════════════════════════════════════════════
+function renderManage() {
+  const list = document.getElementById('manage-list');
+  list.innerHTML = VENDORS_DATA.map(vd => {
+    const s = getVS(vd.id);
+    const bt = getEffectiveBuyTypes(vd);
+    const rows = bt.map((b,i) => `<tr>
+      <td class="bt-type">${TYPE_ICON[b.t]||''} ${b.t}</td>
+      <td><input class="bt-mult-input" type="number" min="0" max="200" data-id="${vd.id}" data-idx="${i}" value="${b.m}"> %</td>
+      <td><button class="bt-del" data-id="${vd.id}" data-idx="${i}">✕</button></td>
+    </tr>`).join('');
+
+    const typeOpts = ITEM_TYPES.map(t => `<option value="${t}">${TYPE_ICON[t]||''} ${t}</option>`).join('');
+
+    return `<details class="mv-detail">
+      <summary>
+        <span class="mv-name">${vd.name}</span>
+        <span class="mv-region-tag">${vd.region} — ${vd.location}</span>
+        ${vd.beastSpeak?'<span class="beast-badge beast-yes" style="font-size:0.6rem">🐾</span>':''}
+      </summary>
+      <div class="mv-content">
+        <table class="buy-types-table">
+          <thead><tr><th>Item Type</th><th>Multiplier</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+        <div class="add-type-row">
+          <select class="ctrl-select" id="addtype-sel-${vd.id}" style="font-size:0.8rem;padding:4px 8px">${typeOpts}</select>
+          <button class="btn-add-type" data-id="${vd.id}">+ Add Type</button>
+          ${s.buyTypes !== null ? `<button class="ctrl-btn" data-action="reset-bt" data-id="${vd.id}" style="font-size:0.65rem">Reset to Wiki</button>` : ''}
+        </div>
+      </div>
+    </details>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'); }
+
+function rerender() {
+  const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab;
+  if (activeTab === 'selling') renderSelling();
+  else if (activeTab === 'gifting') renderGifting();
+  else if (activeTab === 'manage') renderManage();
+}
+
+// ═══════════════════════════════════════════════════════════════════════
+// EVENTS
+// ═══════════════════════════════════════════════════════════════════════
+// Tab switching
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.tab).classList.add('active');
+    rerender();
+  });
+});
+
+// Selling toolbar
+document.getElementById('sel-type').addEventListener('change', e => { F.itemType = e.target.value; renderSelling(); });
+
+document.getElementById('btn-fav-only').addEventListener('click', function() {
+  F.favOnly = !F.favOnly; this.classList.toggle('fav-active', F.favOnly); renderSelling();
+});
+document.getElementById('btn-beast-only').addEventListener('click', function() {
+  F.beastOnly = !F.beastOnly; this.classList.toggle('beast-active', F.beastOnly); renderSelling();
+});
+document.getElementById('btn-hide-empty').addEventListener('click', function() {
+  F.hideEmpty = !F.hideEmpty; this.classList.toggle('active', F.hideEmpty); renderSelling();
+});
+document.querySelectorAll('.sort-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    F.sort = this.dataset.sort; renderSelling();
+  });
+});
+
+// Selling: delegate clicks
+document.getElementById('vendor-grid').addEventListener('click', e => {
+  const btn = e.target.closest('[data-action]');
+  if (!btn) return;
+  const id = btn.dataset.id;
+  const s = getVS(id);
+  if (btn.dataset.action === 'fav') {
+    setVS(id, { isFavorite: !s.isFavorite });
+    renderSelling();
+  } else if (btn.dataset.action === 'fav-up') {
+    if (s.favorLevel < 6) { setVS(id, { favorLevel: s.favorLevel + 1 }); renderSelling(); }
+  } else if (btn.dataset.action === 'fav-dn') {
+    if (s.favorLevel > 0) { setVS(id, { favorLevel: s.favorLevel - 1 }); renderSelling(); }
+  }
+});
+
+// Selling: cash input
+document.getElementById('vendor-grid').addEventListener('change', e => {
+  if (!e.target.classList.contains('cash-input')) return;
+  const id = e.target.dataset.id;
+  const val = parseFloat(e.target.value);
+  if (!isNaN(val)) { setCash(id, Math.max(0, val)); renderSelling(); }
+});
+
+// Gifting toolbar
+document.getElementById('gift-search').addEventListener('input', e => { F.giftSearch = e.target.value; renderGifting(); });
+document.getElementById('btn-gift-fav').addEventListener('click', function() {
+  F.giftFavOnly = !F.giftFavOnly; this.classList.toggle('fav-active', F.giftFavOnly); renderGifting();
+});
+
+// Gifting: delegate
+document.getElementById('gift-grid').addEventListener('click', e => {
+  // Favorite star
+  const star = e.target.closest('.fav-star');
+  if (star) {
+    const id = star.dataset.id;
+    const s = getVS(id);
+    setVS(id, { isFavorite: !s.isFavorite });
+    renderGifting(); return;
+  }
+  // Add gift row
+  const addBtn = e.target.closest('.btn-add-gift');
+  if (addBtn) {
+    const vid = addBtn.dataset.vid;
+    const s = getVS(vid);
+    const gt = [...(s.giftTable||[]), {name:'',value:''}];
+    setVS(vid, { giftTable: gt });
+    renderGifting(); return;
+  }
+  // Delete gift row
+  const delBtn = e.target.closest('.gi-del');
+  if (delBtn) {
+    const vid = delBtn.dataset.vid;
+    const idx = parseInt(delBtn.dataset.idx);
+    const s = getVS(vid);
+    const gt = s.giftTable.filter((_,i) => i !== idx);
+    setVS(vid, { giftTable: gt });
+    renderGifting(); return;
+  }
+});
+
+// Gifting: edit gift table inputs
+document.getElementById('gift-grid').addEventListener('input', e => {
+  const el = e.target;
+  if (!el.dataset.vid) return;
+  const vid = el.dataset.vid;
+  const idx = parseInt(el.dataset.idx);
+  const field = el.dataset.field;
+  if (field !== 'name' && field !== 'value') return;
+  const s = getVS(vid);
+  const gt = [...(s.giftTable||[])];
+  if (!gt[idx]) return;
+  gt[idx] = { ...gt[idx], [field]: el.value };
+  setVS(vid, { giftTable: gt });
+  // Re-render just the calc cells for this row without full re-render
+  const fl = s.favorLevel;
+  const toNext = fl < 6 ? FAVOR_STEP[fl] : null;
+  const toSM   = fl < 6 ? FAVOR_STEP.slice(fl).reduce((a,b)=>a+b,0) : null;
+  if (field === 'value') {
+    const val = parseFloat(el.value) || 0;
+    const tr = el.closest('tr');
+    if (tr) {
+      const cells = tr.querySelectorAll('.gi-calc');
+      cells[0].textContent = (val>0&&toNext!==null) ? Math.ceil(toNext/val).toLocaleString() : '—';
+      cells[1].textContent = (val>0&&toSM!==null)   ? Math.ceil(toSM/val).toLocaleString()   : '—';
+    }
+  }
+});
+
+// Manage: delegate
+document.getElementById('manage-list').addEventListener('click', e => {
+  // Add buy type
+  const addBtn = e.target.closest('.btn-add-type');
+  if (addBtn) {
+    const id = addBtn.dataset.id;
+    const sel = document.getElementById('addtype-sel-'+id);
+    const t = sel ? sel.value : null;
+    if (!t) return;
+    const s = getVS(id);
+    const bt = [...getEffectiveBuyTypes(VENDORS_DATA.find(v=>v.id===id))];
+    if (!bt.find(b => b.t === t)) bt.push({t, m:100});
+    setVS(id, { buyTypes: bt });
+    renderManage(); return;
+  }
+  // Delete buy type
+  const delBtn = e.target.closest('.bt-del');
+  if (delBtn) {
+    const id = delBtn.dataset.id;
+    const idx = parseInt(delBtn.dataset.idx);
+    const bt = [...getEffectiveBuyTypes(VENDORS_DATA.find(v=>v.id===id))];
+    bt.splice(idx,1);
+    setVS(id, { buyTypes: bt });
+    renderManage(); return;
+  }
+  // Reset to wiki defaults
+  const resetBtn = e.target.closest('[data-action="reset-bt"]');
+  if (resetBtn) {
+    const id = resetBtn.dataset.id;
+    setVS(id, { buyTypes: null });
+    renderManage(); return;
+  }
+});
+
+document.getElementById('manage-list').addEventListener('change', e => {
+  const el = e.target;
+  if (!el.classList.contains('bt-mult-input')) return;
+  const id = el.dataset.id;
+  const idx = parseInt(el.dataset.idx);
+  const val = Math.min(200, Math.max(0, parseInt(el.value)||0));
+  const bt = [...getEffectiveBuyTypes(VENDORS_DATA.find(v=>v.id===id))];
+  if (bt[idx]) bt[idx] = { ...bt[idx], m: val };
+  setVS(id, { buyTypes: bt });
+});
+
+// Export/Import
+document.getElementById('btn-export-favor').addEventListener('click', () => {
+  const out = { version:1, vendors:{} };
+  VENDORS_DATA.forEach(vd => {
+    const s = getVS(vd.id);
+    out.vendors[vd.id] = { favorLevel: s.favorLevel, isFavorite: s.isFavorite };
+  });
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pg-favor-levels.json';
+  a.click();
+});
+
+document.getElementById('btn-import-favor').addEventListener('click', () => {
+  const raw = document.getElementById('ta-import').value.trim();
+  const res = document.getElementById('import-result');
+  try {
+    const data = JSON.parse(raw);
+    if (!data.vendors) throw new Error('Missing vendors key');
+    let count = 0;
+    Object.entries(data.vendors).forEach(([id, v]) => {
+      if (v.favorLevel !== undefined) setVS(id, { favorLevel: Math.max(0, Math.min(6, parseInt(v.favorLevel)||0)) });
+      if (v.isFavorite !== undefined) setVS(id, { isFavorite: !!v.isFavorite });
+      count++;
+    });
+    res.textContent = `✓ Imported favor levels for ${count} vendors.`;
+    res.className = 'result-msg result-ok';
+    rerender();
+  } catch(err) {
+    res.textContent = `✗ Error: ${err.message}`;
+    res.className = 'result-msg result-err';
+  }
+});
+
+document.getElementById('btn-reset-all').addEventListener('click', () => {
+  if (!confirm('Clear ALL data? This includes favor, cash, timers, and gift tables.')) return;
+  STATE = { vendors: {} };
+  saveState();
+  rerender();
+});
+
+// ═══════════════════════════════════════════════════════════════════════
+// LIVE TIMER UPDATE (every 60s)
+// ═══════════════════════════════════════════════════════════════════════
+setInterval(() => {
+  const activeTab = document.querySelector('.tab-btn.active')?.dataset.tab;
+  if (activeTab === 'selling') {
+    document.querySelectorAll('.timer-display').forEach(el => {
+      const card = el.closest('.vendor-card');
+      if (!card) return;
+      const id = card.dataset.id;
+      const ms = getTimerMs(id);
+      const str = fmtTimer(ms);
+      if (ms === null) { el.className='timer-display timer-none'; el.textContent='⏱ no timer'; }
+      else if (ms === 0) { el.className='timer-display timer-done'; el.textContent='⟳ RESET READY'; }
+      else { el.className='timer-display timer-active'; el.textContent=`⏱ ${str}`; }
+    });
+  }
+}, 60000);
+
+// ═══════════════════════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════════════════════
+loadState();
+renderSelling();
+</script>
+<!-- TIMER MODAL -->
+<div class="modal-overlay" id="timer-modal" style="display:none">
+  <div class="modal-box">
+    <div class="modal-title">⏱ Time Until Reset</div>
+    <label class="modal-label">How long until this vendor resets? (as shown in-game)</label>
+    <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center">
+      <div style="flex:1;text-align:center">
+        <input class="modal-input" type="number" id="timer-d" min="0" max="7" placeholder="0" style="margin-bottom:4px;text-align:center">
+        <div style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase">Days</div>
+      </div>
+      <div style="color:var(--text-muted);padding-bottom:20px;font-size:1.2rem">:</div>
+      <div style="flex:1;text-align:center">
+        <input class="modal-input" type="number" id="timer-h" min="0" max="23" placeholder="0" style="margin-bottom:4px;text-align:center">
+        <div style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase">Hours</div>
+      </div>
+      <div style="color:var(--text-muted);padding-bottom:20px;font-size:1.2rem">:</div>
+      <div style="flex:1;text-align:center">
+        <input class="modal-input" type="number" id="timer-m" min="0" max="59" placeholder="0" style="margin-bottom:4px;text-align:center">
+        <div style="font-family:'Cinzel',serif;font-size:0.62rem;letter-spacing:0.08em;color:var(--text-muted);text-transform:uppercase">Minutes</div>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn danger" id="timer-modal-clear">Clear Timer</button>
+      <button class="modal-btn" id="timer-modal-cancel">Cancel</button>
+      <button class="modal-btn primary" id="timer-modal-save">Save</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── TIMER MODAL ───────────────────────────────────────────────────────
+let _timerModalId = null;
+
+function openTimerModal(id) {
+  _timerModalId = id;
+  const ms = getTimerMs(id);
+  if (ms !== null && ms > 0) {
+    document.getElementById('timer-d').value = Math.floor(ms / 86400000);
+    document.getElementById('timer-h').value = Math.floor((ms % 86400000) / 3600000);
+    document.getElementById('timer-m').value = Math.floor((ms % 3600000) / 60000);
+  } else {
+    document.getElementById('timer-d').value = '';
+    document.getElementById('timer-h').value = '';
+    document.getElementById('timer-m').value = '';
+  }
+  document.getElementById('timer-modal').style.display = 'flex';
+  document.getElementById('timer-d').focus();
+}
+
+document.getElementById('timer-modal-cancel').addEventListener('click', () => {
+  document.getElementById('timer-modal').style.display = 'none';
+  _timerModalId = null;
+});
+document.getElementById('timer-modal-clear').addEventListener('click', () => {
+  if (_timerModalId) setVS(_timerModalId, { timerStart: null });
+  document.getElementById('timer-modal').style.display = 'none';
+  _timerModalId = null;
+  renderSelling();
+});
+document.getElementById('timer-modal-save').addEventListener('click', () => {
+  if (!_timerModalId) return;
+  const d = parseInt(document.getElementById('timer-d').value) || 0;
+  const h = parseInt(document.getElementById('timer-h').value) || 0;
+  const m = parseInt(document.getElementById('timer-m').value) || 0;
+  const msLeft = (d * 86400000) + (h * 3600000) + (m * 60000);
+  // timerStart = now - (7days - msLeft)
+  const ts = Date.now() - (SEVEN_DAYS - msLeft);
+  setVS(_timerModalId, { timerStart: ts });
+  document.getElementById('timer-modal').style.display = 'none';
+  _timerModalId = null;
+  renderSelling();
+});
+document.getElementById('timer-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('timer-modal'))
+    document.getElementById('timer-modal').style.display = 'none';
+});
+
+// Delegate click on timer display badges
+document.getElementById('vendor-grid').addEventListener('click', e => {
+  const td = e.target.closest('.timer-display');
+  if (td) {
+    const card = td.closest('.vendor-card');
+    if (card) openTimerModal(card.dataset.id);
+  }
+});
+</script>
+
+
+</body></html>
