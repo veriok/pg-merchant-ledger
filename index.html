@@ -445,7 +445,7 @@ const VENDORS_DATA = [
     loves:["Fancy Rings", "Precious Gems", "Figurines"], likes:[], hates:[] },
 
   { id:"leonard_allenson", name:"Leonard Allenson", region:"Serbule", location:"East near Dungeon", beastSpeak:true,
-    buyTypes:[],
+    buyTypes:[{t:"Recipes",m:100}],
     limits:[{c:200,p:10000}, {c:200,p:10000}, {c:1600,p:80000}, {c:null,p:null}, {c:null,p:null}, {c:2000,p:100000}, {c:2400,p:120000}],
     loves:["Equipment with Battle Chemistry prerequisites"], likes:[], hates:[] },
 
@@ -465,7 +465,7 @@ const VENDORS_DATA = [
     loves:["Staves", "Orcish Cultural Artifacts", "Gur-Horta"], likes:[], hates:["Nature"] },
 
   { id:"sir_coth", name:"Sir Coth", region:"Serbule", location:"City Center", beastSpeak:false,
-    buyTypes:[{t:"Food",m:100}, {t:"Monster Parts",m:100}, {t:"Jewelry",m:100}],
+    buyTypes:[{t:"Monster Parts",m:100}],
     limits:[{c:null,p:null}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1200,p:60000}],
     loves:["All Art", "Flawless Animal Skins", "Ivory"], likes:[], hates:["Potions"] },
 
@@ -684,47 +684,47 @@ const VENDORS_DATA = [
     limits:[{c:200,p:10000}, {c:200,p:10000}, {c:1000,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:2100,p:100000}, {c:null,p:100000}],
     loves:["Gems"], likes:["Crystals", "Jewelry"], hates:[] },
 
-  { id:"amutasa", name:"Amutasa", region:"Rahu", location:"Rahu", beastSpeak:false,
+  { id:"amutasa", name:"Amutasa", region:"Rahu", location:"Rahu", beastSpeak:true,
     buyTypes:[{t:"Tools",m:100}, {t:"Gems",m:100}, {t:"Potions",m:100}, {t:"Carpentry",m:100}],
     limits:[{c:50,p:2500}, {c:50,p:5000}, {c:400,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:800,p:40000}, {c:1300,p:65000}],
     loves:[], likes:[], hates:[] },
 
-  { id:"ashk_the_answerer", name:"Ashk the Answerer", region:"Rahu", location:"Rahu", beastSpeak:false,
-    buyTypes:[{t:"Equipment",m:100}, {t:"Phlog",m:100}, {t:"Skins",m:100}, {t:"Augument",m:100}],
-    limits:[{c:25,p:1250}, {c:100,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1100,p:50000}, {c:1100,p:50000}],
+  { id:"ashk_the_answerer", name:"Ashk", region:"Rahu", location:"Rahu City (peaceful)", beastSpeak:true,
+    buyTypes:[{t:"Equipment",m:100}, {t:"Phlog",m:100}, {t:"Monster Parts",m:100}, {t:"Augument",m:100}],
+    limits:[{c:25,p:1250}, {c:100,p:5000}, {c:200,p:10000}, {c:400,p:20000}, {c:800,p:40000}, {c:1100,p:50000}, {c:1100,p:50000}],
     loves:["Magic Equipment with", "Animal Horns", "Animal Stingers", "Animal Teeth"], likes:[], hates:[] },
 
-  { id:"hirochi_the_booklord", name:"Hirochi the Booklord", region:"Rahu", location:"Rahu", beastSpeak:false,
+  { id:"hirochi_the_booklord", name:"Hirochi the Booklord", region:"Rahu", location:"Rahu", beastSpeak:true,
     buyTypes:[],
     limits:[{c:50,p:2500}, {c:null,p:7500}, {c:750,p:30000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:45000}, {c:null,p:60000}],
     loves:["New combat textbooks (for any combat skill)"], likes:[], hates:[] },
 
-  { id:"ichin_the_ice_master", name:"Ichin the Ice Master", region:"Rahu", location:"Rahu", beastSpeak:false,
+  { id:"ichin_the_ice_master", name:"Ichin the Ice Master", region:"Rahu", location:"Rahu", beastSpeak:true,
     buyTypes:[{t:"Potions",m:100}, {t:"Monster Parts",m:100}],
     limits:[{c:50,p:2500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:45000}, {c:1200,p:60000}],
     loves:["Mushrooms of all types", "Equipment with Ice Magic prerequisites", "Ice Cores", "Tundra Lichen"], likes:[], hates:[] },
 
-  { id:"nishika", name:"Nishika", region:"Rahu", location:"Rahu", beastSpeak:false,
+  { id:"nishika", name:"Nishika", region:"Rahu", location:"Rahu", beastSpeak:true,
     buyTypes:[{t:"Food",m:100}],
     limits:[{c:50,p:2500}, {c:50,p:2500}, {c:null,p:20000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:65000}],
     loves:["Raw Vegetables", "Bloodstones", "Leather Armor with Archery Prerequisites"], likes:[], hates:[] },
 
-  { id:"rugen", name:"Rugen", region:"Rahu", location:"Rahu", beastSpeak:false,
+  { id:"rugen", name:"Rugen", region:"Rahu", location:"Rahu", beastSpeak:true,
     buyTypes:[{t:"Food",m:100}],
     limits:[{c:50,p:2500}, {c:50,p:2500}, {c:null,p:10000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:15000}, {c:null,p:null}],
     loves:["Raw Fish", "Magic Daggers"], likes:["Paintings"], hates:[] },
 
-  { id:"sirine", name:"Sirine", region:"Rahu", location:"Rahu", beastSpeak:false,
+  { id:"sirine", name:"Sirine", region:"Rahu", location:"Rahu", beastSpeak:true,
     buyTypes:[],
     limits:[{c:null,p:5000}, {c:null,p:null}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:60000}],
     loves:["Cheese"], likes:["Skins"], hates:[] },
 
-  { id:"wintria_irasce", name:"Wintria Irasce", region:"Rahu", location:"Rahu", beastSpeak:false,
+  { id:"wintria_irasce", name:"Wintria Irasce", region:"Rahu", location:"Rahu", beastSpeak:true,
     buyTypes:[],
     limits:[{c:50,p:2500}, {c:null,p:7500}, {c:750,p:30000}, {c:null,p:null}, {c:null,p:null}, {c:1125,p:45000}, {c:null,p:60000}],
     loves:["New textbooks (for any skill EXCEPT combat skills)"], likes:[], hates:[] },
 
-  { id:"zhao", name:"Zhao", region:"Rahu", location:"Rahu", beastSpeak:false,
+  { id:"zhao", name:"Zhao", region:"Rahu", location:"Rahu", beastSpeak:true,
     buyTypes:[],
     limits:[{c:50,p:2500}, {c:150,p:7500}, {c:null,p:30000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:45000}, {c:null,p:null}],
     loves:["Flower Seeds", "Paladium Ore", "Pyrite Ore"], likes:["Flowers, Arrangements & Displays"], hates:[] },
@@ -806,7 +806,7 @@ const VENDORS_DATA = [
 
   { id:"solgribue", name:"Solgribue", region:"Fae Realm", location:"Fae Realm", beastSpeak:true,
     buyTypes:[{t:"Tools",m:100}, {t:"Jewelry",m:100}],
-    limits:[{c:100,p:5000}, {c:null,p:5000}, {c:800,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:1000,p:50000}, {c:1200,p:60000}],
+    limits:[{c:100,p:5000}, {c:200,p:10000}, {c:400,p:20000}, {c:600,p:30000}, {c:800,p:40000}, {c:1000,p:50000}, {c:1200,p:60000}],
     loves:["Necklaces", "Rings"], likes:[], hates:[] },
 
   { id:"dachak_the_digger", name:"Dachak the Digger", region:"Povus", location:"Povus", beastSpeak:true,
