@@ -3,7 +3,7 @@ export const FAVOR_STEP   = [100, 200, 300, 600, 800, 1000];  // favor to go fro
 export const ITEM_TYPES   = ['Food','Potions','Phlog','Gems','Tools','Skins','Leather','Equipment','Jewelry','Monster Parts', 'Skulls', 'Recipes', 'Cloth Armor', 'Carpentry', 'Augument'];
 export const TYPE_ICON    = {Food:'🍖',Potions:'🧪',Phlog:'✨',Gems:'💎',Tools:'🔨',Skins:'🦊',Leather:'🟫',Equipment:'⚔',Jewelry:'💍','Monster Parts':'🏹','Skulls':'💀', 'Recipes':'📄', 'Cloth Armor':'👚', 'Carpentry':'🪑', 'Augument':'⚪'};
 export const SEVEN_DAYS   = 7 * 24 * 60 * 60 * 1000;
-export const REGION_ICON  = {'Serbule':'🏰','Eltibule':'🏟️','Serbule Hills':'🌄','Red Wing Casino':'🐦','Kur Mountains':'⛰️','Sun Vale':'☀️','Ilmari':'🏜️','New Prestibule':'🏛️','Statehelm':'👑','Rahu':'⛓️','Fae Realm':'🧚‍♀️'};
+export const REGION_ICON  = {'Serbule':'🏰','Eltibule':'🏟️','Serbule Hills':'🌄','Red Wing Casino':'🐦','Rahu':'⛓️', 'Kur Mountains':'⛰️','Sun Vale':'☀️','Ilmari':'🏜️','New Prestonbule Cave':'🏛️', 'Povus':'🐸', 'Statehelm':'👑', 'Fae Realm':'🧚‍♀️'};
 export const REGION_ORDER = Object.keys(REGION_ICON);
 
 // limits array index matches FAVOR_LEVELS index
