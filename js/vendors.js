@@ -61,7 +61,7 @@ export const VENDORS_DATA = [
 
   { id:"marna", name:"Marna", region:"Serbule", location:"City Center", beastSpeak:false,
     buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
-    limits:[{c:500,p:2000}, {c:500,p:2000}, {c:800,p:3200}, {c:null,p:null}, {c:null,p:null}, {c:900,p:3600}, {c:1000,p:4000}],
+    limits:[{c:500,p:2000}, {c:500,p:2000}, {c:600,p:2400}, {c:700,p:2800}, {c:800,p:3200}, {c:900,p:3600}, {c:1000,p:4000}],
     loves:["Rare Recipes", "Vegetarian Food", "Fire Staves"], likes:["Animal Skins"], hates:["Meat"] },
 
   { id:"mushroom_jack", name:"Mushroom Jack", region:"Serbule", location:"City Center", beastSpeak:true,
@@ -386,8 +386,8 @@ export const VENDORS_DATA = [
 
   { id:"willem_fangblade", name:"Willem Fangblade", region:"Red Wing Casino", location:"Red Wing Casino", beastSpeak:true,
     buyTypes:[{t:"Gems",m:100}, {t:"Jewelry",m:100}, {t:"Phlog",m:100}, {t:"Augument",m:100}],
-    limits:[{c:200,p:10000}, {c:200,p:10000}, {c:1000,p:50000}, {c:null,p:null}, {c:null,p:null}, {c:2000,p:100000}, {c:null,p:100000}],
-    loves:["Green Crystals", "Brass Items"], likes:[], hates:[] },
+    limits:[{c:200,p:10000}, {c:200,p:10000}, {c:400,p:20000}, {c:800,p:40000}, {c:1000,p:50000}, {c:2000,p:100000}, {c:2000,p:100000}],
+    loves:["Green Crystals", "Brass Items"], likes:[], hates:[]},
 
   { id:"bendith_the_banished", name:"Bendith the Banished", region:"Fae Realm", location:"Fae Realm", beastSpeak:true,
     buyTypes:[{t:"Food",m:100}, {t:"Potions",m:100}],
