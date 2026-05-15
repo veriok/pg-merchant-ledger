@@ -1,7 +1,7 @@
 export const FAVOR_LEVELS = ['Neutral','Comfortable','Friends','Close Friends','Best Friends','Like Family','Soul Mates'];
 export const FAVOR_STEP   = [100, 200, 300, 600, 800, 1000];  // favor to go from level i to i+1
-export const ITEM_TYPES   = ['Food','Potions','Phlog','Gems','Tools','Skins','Leather','Equipment','Jewelry','Monster Parts', 'Skulls', 'Recipes', 'Cloth Armor', 'Carpentry', 'Augument'];
-export const TYPE_ICON    = {Food:'🍖',Potions:'🧪',Phlog:'✨',Gems:'💎',Tools:'🔨',Skins:'🦊',Leather:'🟫',Equipment:'⚔',Jewelry:'💍','Monster Parts':'🏹','Skulls':'💀', 'Recipes':'📄', 'Cloth Armor':'👚', 'Carpentry':'🪑', 'Augument':'⚪'};
+export const ITEM_TYPES   = ['Food','Potions','Phlog','Gems','Tools','Skins','Leather','Equipment','Jewelry','Monster Parts', 'Skulls', 'Recipes', 'Cloth Armor', 'Carpentry', 'Augument', 'Art'];
+export const TYPE_ICON    = {Food:'🍖',Potions:'🧪',Phlog:'✨',Gems:'💎',Tools:'🔨',Skins:'🦊',Leather:'🟫',Equipment:'⚔',Jewelry:'💍','Monster Parts':'🏹','Skulls':'💀', 'Recipes':'📄', 'Cloth Armor':'👚', 'Carpentry':'🪑', 'Augument':'⚪', 'Art':'🎨'};
 export const SEVEN_DAYS   = 7 * 24 * 60 * 60 * 1000;
 export const REGION_ICON  = {'Serbule':'🏰','Eltibule':'🏟️','Serbule Hills':'🌄','Red Wing Casino':'🐦','Rahu':'⛓️', 'Kur Mountains':'⛰️','Sun Vale':'☀️','Ilmari':'🏜️','New Prestonbule Cave':'🏛️', 'Povus':'🐸', 'Statehelm':'👑', 'Fae Realm':'🧚‍♀️'};
 export const REGION_ORDER = Object.keys(REGION_ICON);
@@ -181,32 +181,32 @@ export const VENDORS_DATA = [
 
   { id:"agrashab", name:"Agrashab", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
     buyTypes:[{t:"Skins",m:100}, {t:"Equipment",m:100}],
-    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:60000}],
+    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:200,p:10000}, {c:400,p:20000}, {c:null,p:40000}, {c:null,p:50000}, {c:null,p:60000}],
     loves:["Fairy Wings", "Magic Clubs", "Ancient Coins"], likes:[], hates:["Troll Flesh"] },
 
   { id:"eleme", name:"Eleme", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
     buyTypes:[{t:"Equipment",m:100}],
-    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:50000}],
+    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:200,p:10000}, {c:400,p:20000}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:50000}],
     loves:["Magic Swords", "Cooked Vegetable Meals", "Winter Court Armor"], likes:[], hates:[] },
 
   { id:"hiral", name:"Hiral", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
-    buyTypes:[{t:"Food",m:100}],
-    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:null,p:25000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
+    buyTypes:[{t:"Food",m:100}, {t:"Recipes",m:100}],
+    limits:[{c:100,p:5000}, {c:100,p:5000}, {c:null,p:10000}, {c:null,p:15000}, {c:null,p:25000}, {c:null,p:null}, {c:null,p:null}],
     loves:[], likes:[], hates:[] },
 
   { id:"kodan", name:"Kodan", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
     buyTypes:[{t:"Phlog",m:10}, {t:"Potions",m:10}, {t:"Food",m:10}, {t:"Gems",m:10}, {t:"Leather",m:10}, {t:"Skins",m:10}, {t:"Tools",m:10}, {t:"Equipment",m:100}, {t:"Jewelry",m:10}, {t:"Monster Parts",m:10}],
-    limits:[{c:null,p:10000}, {c:null,p:10000}, {c:null,p:80000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:100000}, {c:null,p:null}],
+    limits:[{c:null,p:10000}, {c:null,p:10000}, {c:null,p:20000}, {c:null,p:40000}, {c:null,p:80000}, {c:null,p:100000}, {c:null,p:100000}],
     loves:["Figurines"], likes:["Good Metal Slabs (or higher)"], hates:[] },
 
   { id:"norbert", name:"Norbert", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
-    buyTypes:[{t:"Food",m:100}, {t:"Monster Parts",m:100}, {t:"Potions",m:100}],
-    limits:[{c:50,p:2500}, {c:null,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:60000}],
+    buyTypes:[{t:"Food",m:100}, {t:"Monster Parts",m:100}, {t:"Potions",m:100}, {t:"Recipes",m:100}],
+    limits:[{c:50,p:2500}, {c:null,p:5000}, {c:null,p:10000}, {c:null,p:20000}, {c:null,p:40000}, {c:null,p:50000}, {c:null,p:60000}],
     loves:[], likes:["Mushrooms", "Necklaces"], hates:[] },
 
   { id:"preta", name:"Preta", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
-    buyTypes:[],
-    limits:[{c:100,p:5000}, {c:null,p:5000}, {c:500,p:25000}, {c:null,p:null}, {c:null,p:null}, {c:700,p:35000}, {c:800,p:40000}],
+    buyTypes:[{t:"Recipes",m:100}],
+    limits:[{c:100,p:5000}, {c:null,p:5000}, {c:null,p:10000}, {c:300,p:15000}, {c:500,p:25000}, {c:700,p:35000}, {c:800,p:40000}],
     loves:["Odd Scrolls"], likes:[], hates:[] },
 
   { id:"spot", name:"Spot", region:"Sun Vale", location:"Sun Vale", beastSpeak:false,
@@ -216,17 +216,17 @@ export const VENDORS_DATA = [
 
   { id:"the_wombat", name:"The Wombat", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
     buyTypes:[{t:"Monster Parts",m:100}, {t:"Carpentry",m:100}],
-    limits:[{c:25,p:1250}, {c:null,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:null}],
+    limits:[{c:25,p:1250}, {c:null,p:5000}, {c:null,p:10000}, {c:null,p:20000}, {c:null,p:40000}, {c:null,p:50000}, {c:null,p:null}],
     loves:[], likes:[], hates:[] },
 
   { id:"yavazek", name:"Yavazek", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
-    buyTypes:[{t:"Food",m:100}],
-    limits:[{c:150,p:7500}, {c:null,p:null}, {c:1300,p:60000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:80000}, {c:null,p:110000}],
+    buyTypes:[{t:"Food",m:100}, {t:"Monster Parts",m:100}, {t:"Art",m:100}],
+    limits:[{c:150,p:7500}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:1300,p:60000}, {c:null,p:80000}, {c:null,p:110000}],
     loves:["Racial-Slot Equipment"], likes:["Restorative Potions"], hates:[] },
 
   { id:"yogzi", name:"Yogzi", region:"Sun Vale", location:"Sun Vale", beastSpeak:true,
     buyTypes:[{t:"Tools",m:100}, {t:"Carpentry",m:100}],
-    limits:[{c:25,p:1250}, {c:100,p:5000}, {c:null,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:50000}, {c:null,p:50000}],
+    limits:[{c:25,p:1250}, {c:100,p:5000}, {c:null,p:10000}, {c:null,p:20000}, {c:null,p:40000}, {c:null,p:50000}, {c:null,p:50000}],
     loves:["Magic Rings", "Skulls"], likes:[], hates:[] },
 
   { id:"corey_the_croaker", name:"Corey The Croaker", region:"Winter Nexus", location:"Winter Nexus", beastSpeak:true,
