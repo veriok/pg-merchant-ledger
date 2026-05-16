@@ -3,7 +3,7 @@ export const FAVOR_STEP   = [100, 200, 300, 600, 800, 1000];  // favor to go fro
 export const ITEM_TYPES   = ['Food','Potions','Phlog','Gems','Tools','Skins','Leather','Equipment','Jewelry','Monster Parts', 'Skulls', 'Recipes', 'Cloth Armor', 'Carpentry', 'Augument', 'Art'];
 export const TYPE_ICON    = {Food:'🍖',Potions:'🧪',Phlog:'✨',Gems:'💎',Tools:'🔨',Skins:'🦊',Leather:'🟫',Equipment:'⚔',Jewelry:'💍','Monster Parts':'🏹','Skulls':'💀', 'Recipes':'📄', 'Cloth Armor':'👚', 'Carpentry':'🪑', 'Augument':'⚪', 'Art':'🎨'};
 export const SEVEN_DAYS   = 7 * 24 * 60 * 60 * 1000;
-export const REGION_ICON  = {'Serbule':'🏰','Eltibule':'🏟️','Serbule Hills':'🌄','Red Wing Casino':'🐦','Rahu':'⛓️', 'Kur Mountains':'⛰️','Sun Vale':'☀️','Ilmari':'🏜️','New Prestonbule Cave':'🏛️', 'Povus':'🐸', 'Statehelm':'👑', 'Fae Realm':'🧚‍♀️'};
+export const REGION_ICON  = {'Serbule':'🏰','Eltibule':'🏟️','Serbule Hills':'🌄','Red Wing Casino':'🐦','Rahu':'⛓️', 'Kur Mountains':'⛰️','Sun Vale':'☀️','Ilmari':'🏜️','New Prestonbule Cave':'🏛️', 'Povus':'🐸', 'Statehelm':'👑', 'Fae Realm':'🧚‍♀️', 'Vidaria':'😈'};
 export const REGION_ORDER = Object.keys(REGION_ICON);
 
 // limits array index matches FAVOR_LEVELS index
@@ -106,7 +106,7 @@ export const VENDORS_DATA = [
 
   { id:"baroness_marith_felgard", name:"Baroness Marith Felgard", region:"Serbule Hills", location:"Serbule Hills", beastSpeak:true,
     buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
-    limits:[{c:null,p:null}, {c:500,p:2000}, {c:800,p:3200}, {c:null,p:null}, {c:null,p:null}, {c:900,p:3600}, {c:1000,p:4000}],
+    limits:[{c:null,p:null}, {c:500,p:2000}, {c:600,p:2400}, {c:700,p:2800}, {c:800,p:3200}, {c:900,p:3600}, {c:1000,p:4000}],
     loves:[], likes:["Rings", "Fashionable Clothing", "Topaz Gems"], hates:[] },
 
   { id:"brianna_willer", name:"Brianna Willer", region:"Serbule Hills", location:"Serbule Hills", beastSpeak:true,
@@ -126,7 +126,7 @@ export const VENDORS_DATA = [
 
   { id:"sammie_grimspine", name:"Sammie Grimspine", region:"Serbule Hills", location:"Serbule Hills", beastSpeak:true,
     buyTypes:[{t:"Equipment",m:100}, {t:"Jewelry",m:100}],
-    limits:[{c:50,p:2500}, {c:100,p:5000}, {c:880,p:40000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:60000}, {c:null,p:80000}],
+    limits:[{c:50,p:2500}, {c:100,p:5000}, {c:200,p:10000}, {c:400,p:20000}, {c:880,p:40000}, {c:null,p:60000}, {c:null,p:80000}],
     loves:["Calligraphy Benches", "Grapes"], likes:["Raw Meat"], hates:[] },
 
   { id:"paul_vaughn", name:"Paul Vaughn", region:"Serbule Hills", location:"Serbule Hills", beastSpeak:true,
@@ -512,5 +512,15 @@ export const VENDORS_DATA = [
   { id:"sulafa", name:"Sulafa", region:"Statehelm", location:"Marketplace", beastSpeak:true,
     buyTypes:[{t:"Augument",m:100}],
     limits:[{c:null,p:5000}, {c:null,p:5000}, {c:null,p:25000}, {c:null,p:50000}, {c:null,p:75000}, {c:null,p:100000}, {c:null,p:125000}],
-    loves:[], likes:['Phlogiston'], hates:[] }
+    loves:[], likes:['Phlogiston'], hates:[] },
+
+  { id:"korbok", name:"Korbok", region:"Vidaria", location:"Outside Western Gatehouse", beastSpeak:true,
+    buyTypes:[{t:"Phlog",m:100}, {t:"Potions",m:100}, {t:"Food",m:100}, {t:"Gems",m:100}, {t:"Leather",m:100}, {t:"Skins",m:100}, {t:"Tools",m:100}, {t:"Equipment",m:100}, {t:"Jewelry",m:100}, {t:"Monster Parts",m:100}],
+    limits:[{c:150,p:5000}, {c:200,p:10000}, {c:250,p:12500}, {c:300,p:15000}, {c:350,p:17500}, {c:400,p:20000}, {c:500,p:25000}],
+    loves:['Documents', 'Non-Combat Textbooks', 'Poison'], likes:[], hates:[] },
+
+  { id:"pitre_ferrence", name:"Pitre Ferrence", region:"Vidaria", location:"Outside Western Gatehouse", beastSpeak:true,
+    buyTypes:[],
+    limits:[{c:100,p:5000}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}, {c:null,p:null}],
+    loves:['Food', 'Cooking Ingredients', 'Hellfreeze'], likes:[], hates:[] }
 ];
